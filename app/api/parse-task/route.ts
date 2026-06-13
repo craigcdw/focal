@@ -43,7 +43,8 @@ export async function POST(req: NextRequest) {
       messages: [{ role: "user", content: text }],
     });
 
-    const raw = (message.content[0] as { type: string; text: string }).text.trim();
+    let raw = (message.content[0] as { type: string; text: string }).text.trim();
+    raw = raw.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
     const parsed = JSON.parse(raw);
     return NextResponse.json(parsed);
   } catch (err) {
