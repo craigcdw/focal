@@ -41,7 +41,6 @@ const SAVED_KEY = "focal_saved_recipes";
 function loadSaved(): SavedRecipe[] {
   try { return JSON.parse(localStorage.getItem(SAVED_KEY) ?? "[]"); } catch { return []; }
 }
-
 function persistSaved(recipes: SavedRecipe[]) {
   localStorage.setItem(SAVED_KEY, JSON.stringify(recipes));
 }
@@ -58,117 +57,136 @@ function RecipeCard({
   const [showMethod, setShowMethod] = useState(false);
 
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 overflow-hidden">
-      {/* Header */}
-      <div className="bg-gradient-to-br from-orange-500 via-amber-500 to-yellow-400 p-6 text-white">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1">
-            {recipe.pan && (
-              <span className="inline-flex items-center gap-1 text-xs font-semibold bg-white/20 px-2.5 py-1 rounded-full mb-3">
-                🍳 One-Pan
-              </span>
-            )}
-            <h2 className="text-2xl font-bold leading-tight mb-1">{recipe.name}</h2>
-            <p className="text-sm opacity-90 leading-relaxed">{recipe.tagline}</p>
-          </div>
-          <div className="flex flex-col gap-2 flex-shrink-0">
+    <div className="rounded-3xl overflow-hidden bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 shadow-sm">
+      {/* Apple-style hero: deep charcoal, crisp white text */}
+      <div className="relative bg-[#1d1d1f] dark:bg-black px-7 pt-7 pb-8">
+        {/* Top-right actions */}
+        <div className="absolute top-5 right-5 flex gap-2">
+          <button
+            onClick={() => onSave(recipe)}
+            className={`w-8 h-8 flex items-center justify-center rounded-full transition-all ${
+              isSaved
+                ? "bg-white/20 text-white"
+                : "bg-white/10 text-white/60 hover:bg-white/20 hover:text-white"
+            }`}
+            title={isSaved ? "Saved" : "Save recipe"}
+          >
+            {isSaved ? <BookmarkCheck size={14} /> : <Bookmark size={14} />}
+          </button>
+          {onRefresh && (
             <button
-              onClick={() => onSave(recipe)}
-              className={`p-2 rounded-xl transition-colors ${isSaved ? "bg-white/40" : "bg-white/20 hover:bg-white/30"}`}
-              title={isSaved ? "Saved!" : "Save recipe"}
+              onClick={onRefresh}
+              disabled={loading}
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 text-white/60 hover:bg-white/20 hover:text-white transition-all disabled:opacity-40"
+              title="New suggestion"
             >
-              {isSaved ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
+              {loading ? <Loader2 size={14} className="animate-spin" /> : <RotateCcw size={14} />}
             </button>
-            {onRefresh && (
-              <button
-                onClick={onRefresh}
-                disabled={loading}
-                className="bg-white/20 hover:bg-white/30 transition-colors p-2 rounded-xl"
-                title="Generate new recipe"
-              >
-                {loading ? <Loader2 size={16} className="animate-spin" /> : <RotateCcw size={16} />}
-              </button>
-            )}
-          </div>
+          )}
         </div>
 
-        <div className="flex items-center gap-3 mt-4 flex-wrap">
-          <span className="flex items-center gap-1.5 bg-white/20 px-3 py-1.5 rounded-xl text-xs font-medium">
-            <Clock size={12} /> Prep {recipe.prepTime}
+        {/* One-pan badge */}
+        {recipe.pan && (
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold tracking-wide text-white/50 uppercase mb-4">
+            🍳 One-Pan
           </span>
-          <span className="flex items-center gap-1.5 bg-white/20 px-3 py-1.5 rounded-xl text-xs font-medium">
-            <Flame size={12} /> Cook {recipe.cookTime}
-          </span>
-          <span className="flex items-center gap-1.5 bg-white/20 px-3 py-1.5 rounded-xl text-xs font-medium">
-            <Users size={12} /> {recipe.servings} serving{recipe.servings !== "1" ? "s" : ""}
-          </span>
-          <span className="flex items-center gap-1.5 bg-white/20 px-3 py-1.5 rounded-xl text-xs font-medium">
-            <Wallet size={12} /> ~{recipe.estimatedCost}
+        )}
+
+        {/* Title */}
+        <h2 className="text-[1.65rem] font-bold text-white leading-tight tracking-tight mb-2 pr-20">
+          {recipe.name}
+        </h2>
+        <p className="text-sm text-white/60 leading-relaxed mb-7 max-w-lg">{recipe.tagline}</p>
+
+        {/* Stats row — frosted pills */}
+        <div className="flex flex-wrap gap-2">
+          {[
+            { icon: <Clock size={11} />, label: `Prep ${recipe.prepTime}` },
+            { icon: <Flame size={11} />, label: `Cook ${recipe.cookTime}` },
+            { icon: <Users size={11} />, label: `${recipe.servings} serving${recipe.servings !== "1" ? "s" : ""}` },
+            { icon: <Wallet size={11} />, label: `~${recipe.estimatedCost}` },
+          ].map(({ icon, label }) => (
+            <span key={label} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 text-white/80 text-xs font-medium backdrop-blur-sm">
+              {icon}{label}
+            </span>
+          ))}
+          <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 text-white/80 text-xs font-medium">
+            {recipe.difficulty}
           </span>
         </div>
       </div>
 
-      <div className="p-5 space-y-5">
+      {/* Body */}
+      <div className="px-7 py-6 space-y-6 bg-white dark:bg-zinc-900">
+
+        {/* Protein + herbs */}
         <div className="flex flex-wrap gap-2">
-          <span className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300 font-medium">
+          <span className="text-xs px-3 py-1 rounded-full bg-[#f5f5f7] dark:bg-zinc-800 text-[#1d1d1f] dark:text-zinc-200 font-medium">
             🥩 {recipe.protein}
           </span>
-          <span className="text-xs px-2.5 py-1 rounded-lg bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 font-medium">
-            {recipe.difficulty}
-          </span>
-          {recipe.herbs.slice(0, 4).map(h => (
-            <span key={h} className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300 font-medium">
-              <Leaf size={9} /> {h}
+          {recipe.herbs.slice(0, 5).map(h => (
+            <span key={h} className="flex items-center gap-1 text-xs px-3 py-1 rounded-full bg-[#f0faf4] dark:bg-green-950 text-green-800 dark:text-green-300 font-medium">
+              <Leaf size={9} />{h}
             </span>
           ))}
           {recipe.tags.filter(t => t !== "one-pan").map(t => (
-            <span key={t} className="text-xs px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-300 font-medium">
+            <span key={t} className="text-xs px-3 py-1 rounded-full bg-[#f5f5f7] dark:bg-zinc-800 text-[#6e6e73] dark:text-zinc-400 font-medium">
               {t}
             </span>
           ))}
         </div>
 
+        {/* Divider */}
+        <div className="h-px bg-gray-100 dark:bg-zinc-800" />
+
+        {/* Ingredients */}
         <div>
-          <div className="flex items-center gap-2 mb-3">
-            <ShoppingBag size={14} className="text-gray-400" />
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Ingredients</h3>
+          <div className="flex items-center gap-2 mb-4">
+            <ShoppingBag size={13} className="text-[#6e6e73] dark:text-zinc-400" />
+            <h3 className="text-xs font-semibold text-[#6e6e73] dark:text-zinc-400 uppercase tracking-widest">Ingredients</h3>
           </div>
           <div className="space-y-0">
             {recipe.ingredients.map((ing, i) => (
-              <div key={i} className="flex items-start gap-3 py-1.5 border-b border-gray-50 dark:border-zinc-800 last:border-0">
-                <span className="text-xs font-semibold text-gray-900 dark:text-white w-16 flex-shrink-0 text-right">{ing.amount}</span>
-                <span className="text-xs text-gray-700 dark:text-zinc-300 flex-1">
+              <div key={i} className="flex items-baseline gap-4 py-2.5 border-b border-gray-50 dark:border-zinc-800 last:border-0">
+                <span className="text-xs font-semibold text-[#1d1d1f] dark:text-white w-14 flex-shrink-0 text-right tabular-nums">
+                  {ing.amount}
+                </span>
+                <span className="text-sm text-[#1d1d1f] dark:text-zinc-200 flex-1">
                   {ing.unit}
-                  {ing.note ? <span className="text-gray-400 dark:text-zinc-500"> — {ing.note}</span> : null}
+                  {ing.note && <span className="text-[#6e6e73] dark:text-zinc-500 text-xs ml-1">— {ing.note}</span>}
                 </span>
               </div>
             ))}
           </div>
         </div>
 
+        {/* Jamie tip */}
         {recipe.tip && (
-          <div className="flex items-start gap-2.5 bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-xl p-3.5">
-            <Lightbulb size={14} className="text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
-            <p className="text-xs text-amber-800 dark:text-amber-200 leading-relaxed">{recipe.tip}</p>
+          <div className="flex items-start gap-3 bg-[#f5f5f7] dark:bg-zinc-800 rounded-2xl px-4 py-4">
+            <Lightbulb size={13} className="text-[#6e6e73] dark:text-zinc-400 flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-[#1d1d1f] dark:text-zinc-300 leading-relaxed">{recipe.tip}</p>
           </div>
         )}
 
+        {/* Method */}
         <button
           onClick={() => setShowMethod(s => !s)}
-          className="w-full flex items-center justify-between p-3.5 rounded-xl bg-gray-50 dark:bg-zinc-800 text-sm font-semibold text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-700 transition-colors"
+          className="w-full flex items-center justify-between py-4 border-t border-gray-100 dark:border-zinc-800 text-sm font-semibold text-[#1d1d1f] dark:text-white group"
         >
-          <span>Method ({recipe.method.length} steps)</span>
-          {showMethod ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+          <span>Method <span className="text-[#6e6e73] dark:text-zinc-500 font-normal text-xs ml-1">{recipe.method.length} steps</span></span>
+          <span className="w-6 h-6 flex items-center justify-center rounded-full bg-[#f5f5f7] dark:bg-zinc-800 text-[#1d1d1f] dark:text-zinc-300 group-hover:bg-gray-200 dark:group-hover:bg-zinc-700 transition-colors">
+            {showMethod ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+          </span>
         </button>
 
         {showMethod && (
-          <ol className="space-y-3">
+          <ol className="space-y-4 pt-1">
             {recipe.method.map((step, i) => (
-              <li key={i} className="flex items-start gap-3">
-                <span className="w-6 h-6 rounded-full bg-orange-100 dark:bg-orange-950 text-orange-700 dark:text-orange-300 text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+              <li key={i} className="flex items-start gap-4">
+                <span className="w-6 h-6 rounded-full bg-[#1d1d1f] dark:bg-white text-white dark:text-[#1d1d1f] text-[11px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
                   {i + 1}
                 </span>
-                <p className="text-sm text-gray-700 dark:text-zinc-300 leading-relaxed">{step}</p>
+                <p className="text-sm text-[#1d1d1f] dark:text-zinc-300 leading-relaxed">{step}</p>
               </li>
             ))}
           </ol>
@@ -180,16 +198,19 @@ function RecipeCard({
 
 function RecipeSkeleton() {
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 overflow-hidden animate-pulse">
-      <div className="bg-gradient-to-br from-orange-300 to-yellow-300 p-6 h-44" />
-      <div className="p-5 space-y-4">
-        <div className="flex gap-2">
-          <div className="h-6 w-20 bg-gray-100 dark:bg-zinc-800 rounded-lg" />
-          <div className="h-6 w-16 bg-gray-100 dark:bg-zinc-800 rounded-lg" />
-          <div className="h-6 w-24 bg-gray-100 dark:bg-zinc-800 rounded-lg" />
+    <div className="rounded-3xl overflow-hidden border border-gray-100 dark:border-zinc-800 animate-pulse">
+      <div className="bg-[#1d1d1f] dark:bg-black h-52 px-7 pt-7 pb-8 space-y-3">
+        <div className="h-3 w-20 bg-white/10 rounded-full" />
+        <div className="h-7 w-3/4 bg-white/10 rounded-xl" />
+        <div className="h-4 w-1/2 bg-white/10 rounded-lg" />
+        <div className="flex gap-2 pt-4">
+          {[1,2,3,4].map(i => <div key={i} className="h-7 w-20 bg-white/10 rounded-full" />)}
         </div>
-        <div className="space-y-2">
-          {[1,2,3,4,5].map(i => <div key={i} className="h-4 bg-gray-100 dark:bg-zinc-800 rounded" style={{ width: `${60 + i * 8}%` }} />)}
+      </div>
+      <div className="bg-white dark:bg-zinc-900 p-7 space-y-4">
+        <div className="flex gap-2">{[1,2,3].map(i => <div key={i} className="h-6 w-20 bg-gray-100 dark:bg-zinc-800 rounded-full" />)}</div>
+        <div className="space-y-3 pt-2">
+          {[1,2,3,4,5,6].map(i => <div key={i} className="h-4 bg-gray-100 dark:bg-zinc-800 rounded" style={{ width: `${50 + i * 8}%` }} />)}
         </div>
       </div>
     </div>
@@ -204,29 +225,30 @@ function SavedRecipeRow({ saved, onDelete, onSave, isSaved }: {
 }) {
   const [expanded, setExpanded] = useState(false);
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 overflow-hidden">
+    <div className="rounded-2xl overflow-hidden border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900">
       <button
         onClick={() => setExpanded(e => !e)}
-        className="w-full flex items-center gap-3 p-4 text-left hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
+        className="w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-[#f5f5f7] dark:hover:bg-zinc-800 transition-colors"
       >
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-amber-400 flex items-center justify-center text-white flex-shrink-0">
-          <BookOpen size={16} />
+        <div className="w-10 h-10 rounded-xl bg-[#1d1d1f] dark:bg-zinc-800 flex items-center justify-center flex-shrink-0">
+          <BookOpen size={15} className="text-white dark:text-zinc-300" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{saved.name}</p>
-          <p className="text-xs text-gray-400 dark:text-zinc-500 mt-0.5">
-            🥩 {saved.protein} · {saved.prepTime} prep · ~{saved.estimatedCost} · Saved {format(new Date(saved.savedAt), "d MMM yyyy")}
+          <p className="text-sm font-semibold text-[#1d1d1f] dark:text-white truncate">{saved.name}</p>
+          <p className="text-xs text-[#6e6e73] dark:text-zinc-500 mt-0.5">
+            🥩 {saved.protein} · {saved.prepTime} prep · ~{saved.estimatedCost} · {format(new Date(saved.savedAt), "d MMM yyyy")}
           </p>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           <button
             onClick={e => { e.stopPropagation(); onDelete(saved.savedId); }}
-            className="p-1.5 rounded-lg text-gray-300 dark:text-zinc-600 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950 transition-all"
-            title="Remove from saved"
+            className="w-7 h-7 flex items-center justify-center rounded-full text-[#6e6e73] dark:text-zinc-600 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950 transition-all"
           >
             <Trash2 size={13} />
           </button>
-          {expanded ? <ChevronUp size={15} className="text-gray-400" /> : <ChevronDown size={15} className="text-gray-400" />}
+          <span className="w-6 h-6 flex items-center justify-center rounded-full bg-[#f5f5f7] dark:bg-zinc-800 text-[#6e6e73] dark:text-zinc-400">
+            {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+          </span>
         </div>
       </button>
 
@@ -266,17 +288,13 @@ export function RecipesView() {
     loadDailyRecipe();
   }, []);
 
-  function isSaved(recipe: Recipe) {
+  function isSavedFn(recipe: Recipe) {
     return savedRecipes.some(s => s.name === recipe.name);
   }
 
   function handleSave(recipe: Recipe) {
-    if (isSaved(recipe)) return;
-    const entry: SavedRecipe = {
-      ...recipe,
-      savedAt: new Date().toISOString(),
-      savedId: crypto.randomUUID(),
-    };
+    if (isSavedFn(recipe)) return;
+    const entry: SavedRecipe = { ...recipe, savedAt: new Date().toISOString(), savedId: crypto.randomUUID() };
     const updated = [entry, ...savedRecipes];
     setSavedRecipes(updated);
     persistSaved(updated);
@@ -335,26 +353,27 @@ export function RecipesView() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-7 max-w-2xl">
+      {/* Header */}
       <div>
-        <h1 className="text-3xl font-semibold text-gray-900 dark:text-white tracking-tight">Recipes</h1>
-        <p className="text-gray-500 dark:text-zinc-400 mt-1">Low-carb · High protein · One-pan · Herb-forward</p>
+        <h1 className="text-3xl font-bold text-[#1d1d1f] dark:text-white tracking-tight">Recipes</h1>
+        <p className="text-[#6e6e73] dark:text-zinc-400 mt-1 text-sm">Low-carb · High protein · One-pan · Herb-forward</p>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-1 bg-gray-100 dark:bg-zinc-800 p-1 rounded-xl w-fit">
+      {/* Segmented control — Apple style */}
+      <div className="inline-flex bg-[#f5f5f7] dark:bg-zinc-800 p-1 rounded-xl gap-0.5">
         {([
-          { key: "daily",  label: "Tonight's Suggestion" },
+          { key: "daily",  label: "Tonight" },
           { key: "pantry", label: "Pantry Spinner" },
-          { key: "saved",  label: `Saved${savedRecipes.length > 0 ? ` (${savedRecipes.length})` : ""}` },
+          { key: "saved",  label: savedRecipes.length > 0 ? `Saved  ${savedRecipes.length}` : "Saved" },
         ] as { key: Tab; label: string }[]).map(t => (
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
               tab === t.key
-                ? "bg-white dark:bg-zinc-900 text-gray-900 dark:text-white shadow-sm"
-                : "text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200"
+                ? "bg-white dark:bg-zinc-700 text-[#1d1d1f] dark:text-white shadow-sm"
+                : "text-[#6e6e73] dark:text-zinc-400 hover:text-[#1d1d1f] dark:hover:text-zinc-200"
             }`}
           >
             {t.label}
@@ -362,15 +381,16 @@ export function RecipesView() {
         ))}
       </div>
 
-      {/* Daily */}
+      {/* Tonight */}
       {tab === "daily" && (
-        <section className="space-y-3">
-          <p className="text-xs text-gray-400 dark:text-zinc-500 flex items-center gap-1.5">
-            <Sparkles size={11} className="text-amber-400" /> {today} · Refreshes each day · Hit 🔄 to get a different suggestion
+        <section className="space-y-4">
+          <p className="text-xs text-[#6e6e73] dark:text-zinc-500 flex items-center gap-1.5">
+            <Sparkles size={11} className="text-[#0071e3]" />
+            {today} · Refreshes daily · Hit ↺ for a different suggestion
           </p>
           {dailyLoading && <RecipeSkeleton />}
           {dailyError && (
-            <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-2xl p-4 text-sm text-red-700 dark:text-red-300">
+            <div className="bg-[#fff2f2] dark:bg-red-950 border border-red-100 dark:border-red-800 rounded-2xl p-4 text-sm text-red-600 dark:text-red-300">
               {dailyError} — <button onClick={refreshDailyRecipe} className="underline">Try again</button>
             </div>
           )}
@@ -380,7 +400,7 @@ export function RecipesView() {
               onRefresh={refreshDailyRecipe}
               loading={dailyLoading}
               onSave={handleSave}
-              isSaved={isSaved(dailyRecipe)}
+              isSaved={isSavedFn(dailyRecipe)}
             />
           )}
         </section>
@@ -389,27 +409,26 @@ export function RecipesView() {
       {/* Pantry */}
       {tab === "pantry" && (
         <section className="space-y-4">
-          <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5 space-y-4">
+          <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-6 space-y-4">
             <div>
-              <label className="text-xs text-gray-500 dark:text-zinc-400 mb-2 block">
-                List what's in your fridge / pantry — separated by commas.
-              </label>
+              <p className="text-sm font-semibold text-[#1d1d1f] dark:text-white mb-1">What's in your fridge?</p>
+              <p className="text-xs text-[#6e6e73] dark:text-zinc-400 mb-3">List ingredients separated by commas — Claude will find the best meal you can make.</p>
               <textarea
                 value={pantryInput}
                 onChange={e => setPantryInput(e.target.value)}
                 placeholder="e.g. chicken breast, eggs, broccoli, feta, garlic, lemon, coriander, cumin..."
                 rows={3}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-700 bg-transparent text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-green-400 resize-none"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-700 bg-[#f5f5f7] dark:bg-zinc-800 text-sm text-[#1d1d1f] dark:text-white placeholder-[#6e6e73] dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#0071e3] resize-none"
               />
             </div>
             <button
               onClick={spinPantryRecipe}
               disabled={pantryLoading || !pantryInput.trim()}
-              className="w-full flex items-center justify-center gap-2 py-3 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white rounded-xl text-sm font-semibold transition-colors"
+              className="w-full flex items-center justify-center gap-2 py-3 bg-[#0071e3] hover:bg-[#0077ed] active:bg-[#006edb] disabled:opacity-40 text-white rounded-xl text-sm font-semibold transition-colors"
             >
               {pantryLoading
-                ? <><Loader2 size={15} className="animate-spin" /> Finding your recipe…</>
-                : <><Sparkles size={15} /> Spin a Recipe</>
+                ? <><Loader2 size={14} className="animate-spin" /> Finding your recipe…</>
+                : <><Sparkles size={14} /> Spin a Recipe</>
               }
             </button>
             {pantryError && <p className="text-xs text-red-500">{pantryError}</p>}
@@ -421,7 +440,7 @@ export function RecipesView() {
               onRefresh={spinPantryRecipe}
               loading={pantryLoading}
               onSave={handleSave}
-              isSaved={isSaved(pantryRecipe)}
+              isSaved={isSavedFn(pantryRecipe)}
             />
           )}
         </section>
@@ -431,16 +450,18 @@ export function RecipesView() {
       {tab === "saved" && (
         <section className="space-y-3">
           {savedRecipes.length === 0 ? (
-            <div className="text-center py-16 space-y-3">
-              <Bookmark size={36} className="mx-auto text-gray-200 dark:text-zinc-700" />
-              <p className="text-sm text-gray-400 dark:text-zinc-500">No saved recipes yet.</p>
-              <p className="text-xs text-gray-400 dark:text-zinc-500">
-                Hit the <BookmarkCheck size={11} className="inline" /> button on any recipe to save it here.
-              </p>
+            <div className="text-center py-20 space-y-3">
+              <div className="w-14 h-14 rounded-2xl bg-[#f5f5f7] dark:bg-zinc-800 flex items-center justify-center mx-auto">
+                <Bookmark size={22} className="text-[#6e6e73] dark:text-zinc-500" />
+              </div>
+              <p className="text-sm font-medium text-[#1d1d1f] dark:text-white">No saved recipes yet</p>
+              <p className="text-xs text-[#6e6e73] dark:text-zinc-500">Tap the bookmark on any recipe to save it here.</p>
             </div>
           ) : (
             <>
-              <p className="text-xs text-gray-400 dark:text-zinc-500">{savedRecipes.length} recipe{savedRecipes.length !== 1 ? "s" : ""} saved · Click any to expand</p>
+              <p className="text-xs text-[#6e6e73] dark:text-zinc-500">
+                {savedRecipes.length} recipe{savedRecipes.length !== 1 ? "s" : ""} · Tap any to expand
+              </p>
               <div className="space-y-2">
                 {savedRecipes.map(s => (
                   <SavedRecipeRow
