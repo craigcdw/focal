@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Brain, ChevronRight, RotateCcw, Trophy, Zap, BookOpen, Star, Check, X } from "lucide-react";
 
-type Deck = "microsoft365" | "copilotStudio" | "azureAI" | "powerPlatform" | "anthropic";
+type Deck = "microsoft365" | "copilotStudio" | "azureAI" | "powerPlatform" | "anthropic" | "ab730";
 
 interface Card {
   id: string;
@@ -49,6 +49,13 @@ const DECKS: Record<Deck, { label: string; color: string; bg: string; darkBg: st
     darkBg: "dark:bg-orange-950",
     icon: "Cl",
   },
+  ab730: {
+    label: "AB-730 Exam Prep",
+    color: "#107c10",
+    bg: "bg-green-50",
+    darkBg: "dark:bg-green-950",
+    icon: "AB",
+  },
 };
 
 const ALL_CARDS: Card[] = [
@@ -90,6 +97,27 @@ const ALL_CARDS: Card[] = [
   { id: "an5", deck: "anthropic", question: "What is prompt caching in Claude's API?", answer: "Prompt caching stores repeated parts of a prompt (like a long system prompt or document) so subsequent requests reuse the cached version, reducing cost and latency.", options: ["Saving prompts to a database", "Caching repeated prompt prefixes to reduce cost and latency", "A rate limiting feature", "Storing chat history"] },
   { id: "an6", deck: "anthropic", question: "What does MCP stand for in the context of Claude?", answer: "Model Context Protocol — an open standard that lets Claude connect to external data sources, tools, and services through a standardised interface.", options: ["Multi-Claude Pipeline", "Model Context Protocol", "Managed Compute Platform", "Meta Cognitive Process"] },
   { id: "an7", deck: "anthropic", question: "What is Claude's 'extended thinking' feature?", answer: "Extended thinking lets Claude reason through complex problems step by step in a scratchpad before giving its final answer, improving accuracy on hard tasks.", options: ["A longer response mode", "Step-by-step reasoning before the final answer", "A multi-turn memory feature", "A slower streaming mode"] },
+
+  // AB-730: Understand generative AI fundamentals (25–30%)
+  { id: "ab1", deck: "ab730", question: "How does Microsoft 365 Copilot keep your organisation's information private?", answer: "Copilot operates within your Microsoft 365 tenant boundary — your data is not used to train the underlying AI models and is protected by Microsoft's enterprise compliance and data protection controls.", options: ["It anonymises all prompts before sending them", "It operates within your tenant boundary and data is never used to train AI models", "It stores data in a separate encrypted silo", "It requires manual data classification before use"] },
+  { id: "ab2", deck: "ab730", question: "What is the difference between a Copilot chat experience and an agent experience?", answer: "A chat experience is a general-purpose AI conversation, while an agent experience is a purpose-built copilot configured with specific knowledge, instructions, and capabilities for a defined task or workflow.", options: ["Chat is faster; agents are slower", "Chat is general-purpose; agents are purpose-built with specific knowledge and tasks", "Chat requires a licence; agents are free", "Chat uses GPT-4; agents use GPT-3.5"] },
+  { id: "ab3", deck: "ab730", question: "What is a 'fabrication' (hallucination) risk in generative AI?", answer: "A fabrication is when an AI model generates content that sounds plausible but is factually incorrect — such as inventing citations, statistics, or details that do not exist.", options: ["When the AI refuses to answer", "When the AI generates plausible but factually incorrect content", "When the AI repeats the same answer twice", "When the AI is too slow to respond"] },
+  { id: "ab4", deck: "ab730", question: "What is prompt injection in the context of responsible AI?", answer: "Prompt injection is an attack where malicious instructions hidden in external content (like a webpage or document) manipulate the AI into performing unintended actions.", options: ["Adding too many instructions to a prompt", "Malicious instructions in external content that manipulate AI behaviour", "Injecting code into a Copilot response", "Using profanity in a prompt"] },
+  { id: "ab5", deck: "ab730", question: "How does the context you provide affect Copilot responses?", answer: "Copilot uses the context of your prompt, referenced files, web data, and the app you're using to tailor its responses — more specific context produces more relevant and accurate results.", options: ["Context has no effect on AI responses", "Context from files, web data, and the app shapes the relevance and accuracy of responses", "Only the app context matters", "Only web data affects Copilot responses"] },
+
+  // AB-730: Manage prompts and conversations (35–40%)
+  { id: "ab6", deck: "ab730", question: "What are the key components of an effective Copilot prompt?", answer: "An effective prompt includes a clear goal, relevant context, the right persona or tone, and specific output format expectations — often remembered as Goal, Context, Expectations, Source (GCES).", options: ["Just a clear question", "Goal, context, expected format, and relevant sources", "A keyword list", "A template ID and user name"] },
+  { id: "ab7", deck: "ab730", question: "How can you save a prompt in Microsoft 365 Copilot?", answer: "You can save prompts in the Copilot prompt gallery — accessible via Copilot in Microsoft 365 — to reuse, share, or schedule them later.", options: ["Save it as a Word document", "Use the Copilot prompt gallery to save and reuse prompts", "Copy it to OneNote manually", "Pin it in Teams chat"] },
+  { id: "ab8", deck: "ab730", question: "When should you use the Agent Store instead of creating a new agent?", answer: "Use the Agent Store when a pre-built agent already meets your needs — creating a new agent is appropriate when you need custom knowledge, specific instructions, or workflows not available in existing agents.", options: ["Always use the Agent Store to save time", "Use Agent Store for existing needs; create new agents for custom knowledge or workflows", "Create a new agent whenever possible", "Only IT admins can use the Agent Store"] },
+  { id: "ab9", deck: "ab730", question: "What can you configure when creating a Microsoft 365 Copilot agent?", answer: "You can configure the agent's knowledge sources, instructions (system prompt), suggested prompts, capabilities (like web search or code interpreter), and sharing permissions.", options: ["Only the agent's name and icon", "Knowledge sources, instructions, suggested prompts, capabilities, and sharing", "Only which Microsoft 365 apps it can access", "The AI model version only"] },
+  { id: "ab10", deck: "ab730", question: "What does adding a conversation to a Copilot notebook do?", answer: "It saves the conversation as a persistent, editable document in a Copilot Pages notebook, so you can continue refining it, share it, or link it to other content.", options: ["It deletes the chat history", "It saves the conversation as an editable document in a Copilot Pages notebook", "It exports the chat to Outlook", "It creates a new Teams channel"] },
+
+  // AB-730: Draft and analyse business content (25–30%)
+  { id: "ab11", deck: "ab730", question: "How can Copilot generate a document from an existing file?", answer: "In Word, you can reference an existing document in your prompt (e.g. 'based on /filename.docx') and Copilot will use its content to draft a new document, summary, or reformatted version.", options: ["Only by copy-pasting content into the prompt", "By referencing an existing file in the prompt using '/' in Word", "By uploading a file to Copilot's portal", "By emailing the file to Copilot"] },
+  { id: "ab12", deck: "ab730", question: "How does Copilot assist in Microsoft Teams meetings?", answer: "Copilot in Teams can take real-time notes, summarise what's been discussed, suggest action items, answer questions about the meeting content, and generate a recap after the call.", options: ["It can only transcribe audio", "It takes notes, summarises discussions, suggests actions, and generates recaps", "It only works in scheduled meetings", "It translates meetings into other languages"] },
+  { id: "ab13", deck: "ab730", question: "What is Copilot Pages used for in a collaboration context?", answer: "Copilot Pages is a multiplayer canvas where team members can co-edit AI-generated content, add context, and refine outputs together in real time — bridging AI responses and human collaboration.", options: ["It replaces SharePoint document libraries", "A multiplayer canvas for co-editing AI-generated content in real time", "A read-only view of Copilot responses", "A meeting scheduling tool"] },
+  { id: "ab14", deck: "ab730", question: "What does 'move data and insights between Microsoft 365 apps' with Copilot mean?", answer: "Copilot can take information from one app (e.g. an Excel table or email thread) and use it to create content in another (e.g. a PowerPoint deck or Word summary) — reducing manual copy-paste work.", options: ["Automatically syncing files between OneDrive and SharePoint", "Using Copilot to transfer insights from one app to create content in another", "Migrating data between tenants", "Exporting Teams chats to Excel"] },
+  { id: "ab15", deck: "ab730", question: "What score is required to pass the AB-730 AI Business Professional exam?", answer: "A score of 700 or greater (out of 1000) is required to pass the AB-730 exam. You have 45 minutes to complete the assessment.", options: ["500 or greater", "650 or greater", "700 or greater", "800 or greater"] },
 ];
 
 type GameMode = "menu" | "quiz" | "flashcard" | "result";
