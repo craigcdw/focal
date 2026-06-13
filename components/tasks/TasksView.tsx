@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Task, Priority, KanbanColumn } from "@/lib/types";
-import { Plus, X, Play, Square, Sparkles, Loader2 } from "lucide-react";
+import { Plus, X, Play, Square, Sparkles, Loader2, Pencil } from "lucide-react";
 import { DatePicker } from "@/components/ui/DatePicker";
 import { format } from "date-fns";
 import { useTimeTracker } from "@/hooks/useTimeTracker";
@@ -22,10 +22,20 @@ const PRIORITY_DOT: Record<Priority, string> = {
   urgent: "bg-red-500",
 };
 
+const EMPTY_FORM = {
+  title: "",
+  description: "",
+  priority: "medium" as Priority,
+  status: "todo" as KanbanColumn,
+  due_date: "",
+  tags: "",
+};
+
 export function TasksView() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [filter, setFilter] = useState<KanbanColumn | "all">("all");
   const supabase = createClient();
   const { activeTaskId, elapsed, formatElapsed, start, stop } = useTimeTracker();
@@ -33,18 +43,9 @@ export function TasksView() {
   const [nlLoading, setNlLoading] = useState(false);
   const [nlError, setNlError] = useState("");
 
-  const [form, setForm] = useState({
-    title: "",
-    description: "",
-    priority: "medium" as Priority,
-    status: "todo" as KanbanColumn,
-    due_date: "",
-    tags: "",
-  });
+  const [form, setForm] = useState(EMPTY_FORM);
 
-  useEffect(() => {
-    fetchTasks();
-  }, []);
+  useEffect(() => { fetchTasks(); }, []);
 
   async function parseNL() {
     if (!nlInput.trim()) return;
@@ -67,6 +68,7 @@ export function TasksView() {
         tags: (data.tags ?? []).join(", "),
       });
       setNlInput("");
+      setEditingTask(null);
       setShowForm(true);
     } catch (err) {
       setNlError(err instanceof Error ? err.message : "Could not parse task. Try again.");
@@ -98,8 +100,44 @@ export function TasksView() {
       subtasks: [],
     }).select().single();
     if (data) setTasks(prev => [data, ...prev]);
-    setForm({ title: "", description: "", priority: "medium", status: "todo", due_date: "", tags: "" });
+    setForm(EMPTY_FORM);
     setShowForm(false);
+  }
+
+  async function saveEdit() {
+    if (!editingTask || !form.title.trim()) return;
+    const updates = {
+      title: form.title,
+      description: form.description,
+      priority: form.priority,
+      status: form.status,
+      due_date: form.due_date || null,
+      tags: form.tags ? form.tags.split(",").map(t => t.trim()).filter(Boolean) : [],
+      updated_at: new Date().toISOString(),
+    };
+    await supabase.from("tasks").update(updates).eq("id", editingTask.id);
+    setTasks(prev => prev.map(t => t.id === editingTask.id ? { ...t, ...updates } : t));
+    setEditingTask(null);
+    setForm(EMPTY_FORM);
+  }
+
+  function openEdit(task: Task) {
+    setEditingTask(task);
+    setShowForm(false);
+    setForm({
+      title: task.title,
+      description: task.description ?? "",
+      priority: task.priority,
+      status: task.status,
+      due_date: task.due_date ?? "",
+      tags: task.tags.join(", "),
+    });
+  }
+
+  function cancelForm() {
+    setShowForm(false);
+    setEditingTask(null);
+    setForm(EMPTY_FORM);
   }
 
   async function toggleSubtask(task: Task, subtaskId: string) {
@@ -111,6 +149,7 @@ export function TasksView() {
   async function deleteTask(id: string) {
     await supabase.from("tasks").delete().eq("id", id);
     setTasks(prev => prev.filter(t => t.id !== id));
+    if (editingTask?.id === id) { setEditingTask(null); setForm(EMPTY_FORM); }
   }
 
   async function updateColumn(id: string, status: KanbanColumn) {
@@ -119,6 +158,8 @@ export function TasksView() {
   }
 
   const filtered = filter === "all" ? tasks : tasks.filter(t => t.status === filter);
+  const isEditing = !!editingTask;
+  const formVisible = showForm || isEditing;
 
   return (
     <div className="space-y-6">
@@ -128,7 +169,7 @@ export function TasksView() {
           <p className="text-gray-500 dark:text-zinc-400 mt-1">{tasks.filter(t => t.status !== "done").length} active</p>
         </div>
         <button
-          onClick={() => setShowForm(true)}
+          onClick={() => { setEditingTask(null); setForm(EMPTY_FORM); setShowForm(true); }}
           className="flex items-center gap-2 px-4 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl text-sm font-semibold hover:opacity-80 transition-opacity"
         >
           <Plus size={16} />
@@ -162,7 +203,7 @@ export function TasksView() {
       </div>
 
       {/* Filter tabs */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-wrap">
         {(["all", "backlog", "todo", "in_progress", "done"] as const).map(col => (
           <button
             key={col}
@@ -178,12 +219,14 @@ export function TasksView() {
         ))}
       </div>
 
-      {/* New task form */}
-      {showForm && (
+      {/* Create / Edit form */}
+      {formVisible && (
         <div className="bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-gray-100 dark:border-zinc-800 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-base font-semibold text-gray-900 dark:text-white">New task</h3>
-            <button onClick={() => setShowForm(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-zinc-200">
+            <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+              {isEditing ? "Edit task" : "New task"}
+            </h3>
+            <button onClick={cancelForm} className="text-gray-400 hover:text-gray-600 dark:hover:text-zinc-200">
               <X size={18} />
             </button>
           </div>
@@ -193,7 +236,7 @@ export function TasksView() {
             onChange={e => setForm(p => ({ ...p, title: e.target.value }))}
             placeholder="Task title"
             className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-transparent text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            onKeyDown={e => e.key === "Enter" && createTask()}
+            onKeyDown={e => e.key === "Enter" && (isEditing ? saveEdit() : createTask())}
           />
           <textarea
             value={form.description}
@@ -241,10 +284,13 @@ export function TasksView() {
             className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-transparent text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <div className="flex gap-3 pt-1">
-            <button onClick={createTask} className="px-5 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl text-sm font-semibold hover:opacity-80 transition-opacity">
-              Create task
+            <button
+              onClick={isEditing ? saveEdit : createTask}
+              className="px-5 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl text-sm font-semibold hover:opacity-80 transition-opacity"
+            >
+              {isEditing ? "Save changes" : "Create task"}
             </button>
-            <button onClick={() => setShowForm(false)} className="px-5 py-2 text-gray-500 dark:text-zinc-400 text-sm hover:text-gray-700 dark:hover:text-zinc-200">
+            <button onClick={cancelForm} className="px-5 py-2 text-gray-500 dark:text-zinc-400 text-sm hover:text-gray-700 dark:hover:text-zinc-200">
               Cancel
             </button>
           </div>
@@ -259,7 +305,14 @@ export function TasksView() {
       ) : (
         <div className="space-y-2">
           {filtered.map(task => (
-            <div key={task.id} className="group bg-white dark:bg-zinc-900 rounded-2xl p-5 border border-gray-100 dark:border-zinc-800 hover:border-gray-200 dark:hover:border-zinc-700 transition-all">
+            <div
+              key={task.id}
+              className={`group bg-white dark:bg-zinc-900 rounded-2xl p-5 border transition-all ${
+                editingTask?.id === task.id
+                  ? "border-blue-400 dark:border-blue-600"
+                  : "border-gray-100 dark:border-zinc-800 hover:border-gray-200 dark:hover:border-zinc-700"
+              }`}
+            >
               <div className="flex items-start gap-3">
                 <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${PRIORITY_DOT[task.priority]}`} />
                 <div className="flex-1 min-w-0">
@@ -267,7 +320,7 @@ export function TasksView() {
                     <p className={`text-sm font-medium ${task.status === "done" ? "line-through text-gray-400 dark:text-zinc-500" : "text-gray-900 dark:text-white"}`}>
                       {task.title}
                     </p>
-                    <div className="flex items-center gap-2 flex-shrink-0">
+                    <div className="flex items-center gap-1.5 flex-shrink-0">
                       {activeTaskId === task.id && (
                         <span className="text-xs font-mono text-blue-600 dark:text-blue-400 tabular-nums">
                           {formatElapsed(elapsed)}
@@ -285,8 +338,16 @@ export function TasksView() {
                         {activeTaskId === task.id ? <Square size={13} /> : <Play size={13} />}
                       </button>
                       <button
+                        onClick={() => openEdit(task)}
+                        className="opacity-0 group-hover:opacity-100 p-1 rounded-lg text-gray-300 dark:text-zinc-600 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950 transition-all"
+                        title="Edit task"
+                      >
+                        <Pencil size={13} />
+                      </button>
+                      <button
                         onClick={() => deleteTask(task.id)}
-                        className="opacity-0 group-hover:opacity-100 text-gray-300 dark:text-zinc-600 hover:text-red-500 transition-all"
+                        className="opacity-0 group-hover:opacity-100 p-1 rounded-lg text-gray-300 dark:text-zinc-600 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950 transition-all"
+                        title="Delete task"
                       >
                         <X size={15} />
                       </button>
