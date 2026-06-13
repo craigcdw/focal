@@ -1,5 +1,5 @@
-import { WordGame } from "@/components/game/WordGame";
+import { FlashCardGame } from "@/components/game/FlashCardGame";
 
 export default function GamePage() {
-  return <WordGame />;
+  return <FlashCardGame />;
 }

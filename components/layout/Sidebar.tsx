@@ -9,7 +9,7 @@ import {
   Calendar,
   FileText,
   Timer,
-  Gamepad2,
+  Brain,
   Sun,
   Moon,
   LogOut,
@@ -25,7 +25,7 @@ const nav = [
   { href: "/dashboard/calendar", label: "Calendar", icon: Calendar },
   { href: "/dashboard/notes", label: "Notes", icon: FileText },
   { href: "/dashboard/pomodoro", label: "Focus", icon: Timer },
-  { href: "/dashboard/game", label: "Break", icon: Gamepad2 },
+  { href: "/dashboard/game", label: "Learn", icon: Brain },
 ];
 
 export function Sidebar() {
@@ -40,7 +40,7 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="w-64 h-screen fixed left-0 top-0 flex flex-col bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl border-r border-gray-100 dark:border-zinc-800 z-40">
+    <aside className="hidden md:flex w-64 h-screen fixed left-0 top-0 flex-col bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl border-r border-gray-100 dark:border-zinc-800 z-40">
       {/* Logo */}
       <div className="px-6 py-5 border-b border-gray-100 dark:border-zinc-800">
         <span className="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">

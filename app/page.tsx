@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SignInButton } from "@/components/layout/SignInButton";
+import { Footer } from "@/components/layout/Footer";
 
 export default async function LandingPage() {
   const supabase = await createClient();
@@ -29,19 +30,22 @@ export default async function LandingPage() {
         </h1>
 
         <p className="text-xl text-gray-500 dark:text-zinc-400 max-w-lg mb-12 leading-relaxed">
-          Tasks, kanban, calendar, notes, focus timer, and a word game — all in one beautifully minimal space.
+          Tasks, kanban, calendar, notes, focus timer, and an AI learning game — all in one beautifully minimal space.
         </p>
 
         <SignInButton />
 
         {/* Feature pills */}
         <div className="flex flex-wrap items-center justify-center gap-3 mt-16">
-          {["Todo & Kanban", "Calendar", "Rich Notes", "Pomodoro Timer", "Word Game", "Dark Mode"].map((f) => (
+          {["Todo & Kanban", "Calendar", "Rich Notes", "Pomodoro Timer", "AI Learning Game", "Dark Mode"].map((f) => (
             <span key={f} className="px-4 py-2 rounded-full bg-gray-100 dark:bg-zinc-900 text-sm text-gray-600 dark:text-zinc-300 font-medium">
               {f}
             </span>
           ))}
         </div>
+      </div>
+      <div className="px-8 pb-6 max-w-6xl mx-auto w-full">
+        <Footer />
       </div>
     </div>
   );
