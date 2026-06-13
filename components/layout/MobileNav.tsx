@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, CheckSquare, Calendar, FileText, Timer, Brain, BarChart2 } from "lucide-react";
+import { LayoutDashboard, CheckSquare, Calendar, FileText, Timer, Brain, Dumbbell, BarChart2 } from "lucide-react";
 
 const nav = [
   { href: "/dashboard", label: "Home", icon: LayoutDashboard },
@@ -11,6 +11,7 @@ const nav = [
   { href: "/dashboard/notes", label: "Notes", icon: FileText },
   { href: "/dashboard/pomodoro", label: "Focus", icon: Timer },
   { href: "/dashboard/game", label: "Learn", icon: Brain },
+  { href: "/dashboard/workouts", label: "Workouts", icon: Dumbbell },
   { href: "/dashboard/reports", label: "Reports", icon: BarChart2 },
 ];
 
