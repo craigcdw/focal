@@ -116,7 +116,7 @@ export function TasksView() {
       updated_at: new Date().toISOString(),
     };
     await supabase.from("tasks").update(updates).eq("id", editingTask.id);
-    setTasks(prev => prev.map(t => t.id === editingTask.id ? { ...t, ...updates } : t));
+    setTasks(prev => prev.map(t => t.id === editingTask.id ? { ...t, ...updates, due_date: updates.due_date ?? undefined } : t));
     setEditingTask(null);
     setForm(EMPTY_FORM);
   }
