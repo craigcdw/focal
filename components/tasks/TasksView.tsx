@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Task, Priority, KanbanColumn } from "@/lib/types";
-import { Plus, X, Play, Square } from "lucide-react";
+import { Plus, X, Play, Square, Sparkles, Loader2 } from "lucide-react";
 import { DatePicker } from "@/components/ui/DatePicker";
 import { format } from "date-fns";
 import { useTimeTracker } from "@/hooks/useTimeTracker";
@@ -29,6 +29,9 @@ export function TasksView() {
   const [filter, setFilter] = useState<KanbanColumn | "all">("all");
   const supabase = createClient();
   const { activeTaskId, elapsed, formatElapsed, start, stop } = useTimeTracker();
+  const [nlInput, setNlInput] = useState("");
+  const [nlLoading, setNlLoading] = useState(false);
+  const [nlError, setNlError] = useState("");
 
   const [form, setForm] = useState({
     title: "",
@@ -42,6 +45,35 @@ export function TasksView() {
   useEffect(() => {
     fetchTasks();
   }, []);
+
+  async function parseNL() {
+    if (!nlInput.trim()) return;
+    setNlLoading(true);
+    setNlError("");
+    try {
+      const res = await fetch("/api/parse-task", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: nlInput }),
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setForm({
+        title: data.title ?? "",
+        description: data.description ?? "",
+        priority: data.priority ?? "medium",
+        status: "todo",
+        due_date: data.due_date ?? "",
+        tags: (data.tags ?? []).join(", "),
+      });
+      setNlInput("");
+      setShowForm(true);
+    } catch {
+      setNlError("Could not parse task. Try again.");
+    } finally {
+      setNlLoading(false);
+    }
+  }
 
   async function fetchTasks() {
     const { data: { user } } = await supabase.auth.getUser();
@@ -102,6 +134,31 @@ export function TasksView() {
           <Plus size={16} />
           New task
         </button>
+      </div>
+
+      {/* Natural language input */}
+      <div className="space-y-1.5">
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Sparkles size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-purple-400 pointer-events-none" />
+            <input
+              value={nlInput}
+              onChange={e => setNlInput(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && parseNL()}
+              placeholder='Try "Call John tomorrow, high priority" or "Write report by Friday #work"'
+              className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-purple-200 dark:border-purple-900 bg-purple-50 dark:bg-purple-950/40 text-gray-900 dark:text-white placeholder-purple-300 dark:placeholder-purple-700 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+            />
+          </div>
+          <button
+            onClick={parseNL}
+            disabled={nlLoading || !nlInput.trim()}
+            className="flex items-center gap-2 px-4 py-2.5 bg-purple-600 text-white rounded-xl text-sm font-semibold hover:bg-purple-700 disabled:opacity-50 transition-colors"
+          >
+            {nlLoading ? <Loader2 size={15} className="animate-spin" /> : <Sparkles size={15} />}
+            {nlLoading ? "Parsing..." : "Add with AI"}
+          </button>
+        </div>
+        {nlError && <p className="text-xs text-red-500 pl-1">{nlError}</p>}
       </div>
 
       {/* Filter tabs */}
