@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Task, Priority, KanbanColumn } from "@/lib/types";
-import { Plus, X, ChevronDown } from "lucide-react";
+import { Plus, X, Play, Square } from "lucide-react";
 import { DatePicker } from "@/components/ui/DatePicker";
 import { format } from "date-fns";
+import { useTimeTracker } from "@/hooks/useTimeTracker";
 
 const PRIORITY_COLORS: Record<Priority, string> = {
   low: "bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-zinc-300",
@@ -27,6 +28,7 @@ export function TasksView() {
   const [showForm, setShowForm] = useState(false);
   const [filter, setFilter] = useState<KanbanColumn | "all">("all");
   const supabase = createClient();
+  const { activeTaskId, elapsed, formatElapsed, start, stop } = useTimeTracker();
 
   const [form, setForm] = useState({
     title: "",
@@ -208,12 +210,30 @@ export function TasksView() {
                     <p className={`text-sm font-medium ${task.status === "done" ? "line-through text-gray-400 dark:text-zinc-500" : "text-gray-900 dark:text-white"}`}>
                       {task.title}
                     </p>
-                    <button
-                      onClick={() => deleteTask(task.id)}
-                      className="opacity-0 group-hover:opacity-100 text-gray-300 dark:text-zinc-600 hover:text-red-500 transition-all flex-shrink-0"
-                    >
-                      <X size={15} />
-                    </button>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      {activeTaskId === task.id && (
+                        <span className="text-xs font-mono text-blue-600 dark:text-blue-400 tabular-nums">
+                          {formatElapsed(elapsed)}
+                        </span>
+                      )}
+                      <button
+                        onClick={() => activeTaskId === task.id ? stop() : start(task.id)}
+                        className={`opacity-0 group-hover:opacity-100 transition-all p-1 rounded-lg ${
+                          activeTaskId === task.id
+                            ? "opacity-100 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950"
+                            : "text-gray-300 dark:text-zinc-600 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950"
+                        }`}
+                        title={activeTaskId === task.id ? "Stop timer" : "Start timer"}
+                      >
+                        {activeTaskId === task.id ? <Square size={13} /> : <Play size={13} />}
+                      </button>
+                      <button
+                        onClick={() => deleteTask(task.id)}
+                        className="opacity-0 group-hover:opacity-100 text-gray-300 dark:text-zinc-600 hover:text-red-500 transition-all"
+                      >
+                        <X size={15} />
+                      </button>
+                    </div>
                   </div>
                   {task.description && (
                     <p className="text-xs text-gray-500 dark:text-zinc-400 mt-1">{task.description}</p>

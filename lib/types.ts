@@ -78,6 +78,17 @@ export interface PomodoroSession {
   task_id?: string;
 }
 
+export interface TimeEntry {
+  id: string;
+  user_id: string;
+  task_id: string;
+  started_at: string;
+  ended_at?: string;
+  duration_seconds?: number;
+  note?: string;
+  created_at: string;
+}
+
 export interface PomodoroSettings {
   work_duration: number;
   short_break: number;

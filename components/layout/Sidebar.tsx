@@ -10,6 +10,7 @@ import {
   FileText,
   Timer,
   Brain,
+  BarChart2,
   Sun,
   Moon,
   LogOut,
@@ -26,6 +27,7 @@ const nav = [
   { href: "/dashboard/notes", label: "Notes", icon: FileText },
   { href: "/dashboard/pomodoro", label: "Focus", icon: Timer },
   { href: "/dashboard/game", label: "Learn", icon: Brain },
+  { href: "/dashboard/reports", label: "Reports", icon: BarChart2 },
 ];
 
 export function Sidebar() {
