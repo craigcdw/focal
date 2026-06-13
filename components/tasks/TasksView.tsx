@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Task, Priority, KanbanColumn } from "@/lib/types";
-import { Plus, X, Play, Square, Sparkles, Loader2, Pencil } from "lucide-react";
+import { Plus, X, Play, Square, Sparkles, Loader2, Pencil, CheckSquare } from "lucide-react";
 import { DatePicker } from "@/components/ui/DatePicker";
 import { format } from "date-fns";
 import { useTimeTracker } from "@/hooks/useTimeTracker";
@@ -44,6 +44,8 @@ export function TasksView() {
   const [nlError, setNlError] = useState("");
 
   const [form, setForm] = useState(EMPTY_FORM);
+  const [newSubtask, setNewSubtask] = useState("");
+  const [subtasks, setSubtasks] = useState<{ id: string; title: string; completed: boolean }[]>([]);
 
   useEffect(() => { fetchTasks(); }, []);
 
@@ -97,10 +99,11 @@ export function TasksView() {
       status: form.status,
       due_date: form.due_date || null,
       tags: form.tags ? form.tags.split(",").map(t => t.trim()).filter(Boolean) : [],
-      subtasks: [],
+      subtasks,
     }).select().single();
     if (data) setTasks(prev => [data, ...prev]);
     setForm(EMPTY_FORM);
+    setSubtasks([]);
     setShowForm(false);
   }
 
@@ -113,6 +116,7 @@ export function TasksView() {
       status: form.status,
       due_date: form.due_date || null,
       tags: form.tags ? form.tags.split(",").map(t => t.trim()).filter(Boolean) : [],
+      subtasks,
       updated_at: new Date().toISOString(),
     };
     await supabase.from("tasks").update(updates).eq("id", editingTask.id);
@@ -124,6 +128,7 @@ export function TasksView() {
   function openEdit(task: Task) {
     setEditingTask(task);
     setShowForm(false);
+    setSubtasks(task.subtasks ?? []);
     setForm({
       title: task.title,
       description: task.description ?? "",
@@ -138,6 +143,18 @@ export function TasksView() {
     setShowForm(false);
     setEditingTask(null);
     setForm(EMPTY_FORM);
+    setSubtasks([]);
+    setNewSubtask("");
+  }
+
+  function addSubtask() {
+    if (!newSubtask.trim()) return;
+    setSubtasks(prev => [...prev, { id: crypto.randomUUID(), title: newSubtask.trim(), completed: false }]);
+    setNewSubtask("");
+  }
+
+  function removeSubtask(id: string) {
+    setSubtasks(prev => prev.filter(s => s.id !== id));
   }
 
   async function toggleSubtask(task: Task, subtaskId: string) {
@@ -283,6 +300,37 @@ export function TasksView() {
             placeholder="Tags (comma separated)"
             className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-transparent text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+          {/* Subtasks */}
+          <div>
+            <label className="text-xs text-gray-500 dark:text-zinc-400 mb-2 flex items-center gap-1.5">
+              <CheckSquare size={12} /> Subtasks
+            </label>
+            {subtasks.length > 0 && (
+              <div className="space-y-1.5 mb-2">
+                {subtasks.map(s => (
+                  <div key={s.id} className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-zinc-800 rounded-lg">
+                    <span className="flex-1 text-xs text-gray-700 dark:text-zinc-300">{s.title}</span>
+                    <button onClick={() => removeSubtask(s.id)} className="text-gray-300 hover:text-red-500 transition-colors">
+                      <X size={12} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="flex gap-2">
+              <input
+                value={newSubtask}
+                onChange={e => setNewSubtask(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && (e.preventDefault(), addSubtask())}
+                placeholder="Add a subtask…"
+                className="flex-1 px-3 py-2 rounded-xl border border-gray-200 dark:border-zinc-700 bg-transparent text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button onClick={addSubtask} className="px-3 py-2 bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 rounded-xl text-xs hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors">
+                Add
+              </button>
+            </div>
+          </div>
+
           <div className="flex gap-3 pt-1">
             <button
               onClick={isEditing ? saveEdit : createTask}
