@@ -38,12 +38,12 @@ const EQUIPMENT_LABELS: Record<Equipment, string> = {
 };
 
 const CATEGORY_COLORS: Record<Category, string> = {
-  shoulder: "bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300",
-  upper:    "bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300",
-  lower:    "bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300",
-  core:     "bg-orange-100 dark:bg-orange-950 text-orange-700 dark:text-orange-300",
-  cardio:   "bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300",
-  stretch:  "bg-teal-100 dark:bg-teal-950 text-teal-700 dark:text-teal-300",
+  shoulder: "bg-[#f5f5f7] dark:bg-zinc-800 text-[#1d1d1f] dark:text-zinc-300",
+  upper:    "bg-[#f5f5f7] dark:bg-zinc-800 text-[#1d1d1f] dark:text-zinc-300",
+  lower:    "bg-[#f5f5f7] dark:bg-zinc-800 text-[#1d1d1f] dark:text-zinc-300",
+  core:     "bg-[#f5f5f7] dark:bg-zinc-800 text-[#1d1d1f] dark:text-zinc-300",
+  cardio:   "bg-[#f5f5f7] dark:bg-zinc-800 text-[#1d1d1f] dark:text-zinc-300",
+  stretch:  "bg-[#f5f5f7] dark:bg-zinc-800 text-[#1d1d1f] dark:text-zinc-300",
 };
 
 const WORKOUTS: Workout[] = [
@@ -395,11 +395,11 @@ const WORKOUTS: Workout[] = [
 
 function EquipmentBadge({ eq }: { eq: Equipment }) {
   const colors: Record<Equipment, string> = {
-    mat: "bg-teal-50 dark:bg-teal-950 text-teal-700 dark:text-teal-300",
-    dumbbells: "bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300",
-    chair: "bg-yellow-50 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300",
-    wall: "bg-stone-100 dark:bg-stone-900 text-stone-600 dark:text-stone-300",
-    bodyweight: "bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-300",
+    mat:        "bg-[#f5f5f7] dark:bg-zinc-800 text-[#6e6e73] dark:text-zinc-400",
+    dumbbells:  "bg-[#f5f5f7] dark:bg-zinc-800 text-[#6e6e73] dark:text-zinc-400",
+    chair:      "bg-[#f5f5f7] dark:bg-zinc-800 text-[#6e6e73] dark:text-zinc-400",
+    wall:       "bg-[#f5f5f7] dark:bg-zinc-800 text-[#6e6e73] dark:text-zinc-400",
+    bodyweight: "bg-[#f5f5f7] dark:bg-zinc-800 text-[#6e6e73] dark:text-zinc-400",
   };
   return (
     <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-medium ${colors[eq]}`}>
@@ -411,7 +411,7 @@ function EquipmentBadge({ eq }: { eq: Equipment }) {
 function ExerciseCard({ ex, index }: { ex: Exercise; index: number }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className={`rounded-2xl border transition-all ${open ? "border-blue-200 dark:border-blue-800 bg-blue-50/30 dark:bg-blue-950/20" : "border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900"}`}>
+    <div className={`rounded-2xl border transition-all ${open ? "border-gray-200 dark:border-zinc-700 bg-[#f5f5f7]/50 dark:bg-zinc-800/50" : "border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900"}`}>
       <button
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-start gap-3 p-4 text-left"
@@ -441,7 +441,7 @@ function ExerciseCard({ ex, index }: { ex: Exercise; index: number }) {
         <div className="px-4 pb-4 space-y-3 border-t border-gray-100 dark:border-zinc-800 pt-3">
           <p className="text-sm text-gray-700 dark:text-zinc-300 leading-relaxed">{ex.cue}</p>
           {ex.shoulderNote && (
-            <div className={`flex items-start gap-2 p-3 rounded-xl text-xs leading-relaxed ${ex.avoid ? "bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300" : "bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300"}`}>
+            <div className={`flex items-start gap-2 p-3 rounded-xl text-xs leading-relaxed ${ex.avoid ? "bg-[#fff1f0] dark:bg-red-950 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300" : "bg-[#f5f5f7] dark:bg-zinc-700/50 border border-gray-200 dark:border-zinc-600 text-[#1d1d1f] dark:text-zinc-300"}`}>
               {ex.avoid
                 ? <AlertTriangle size={13} className="flex-shrink-0 mt-0.5" />
                 : <CheckCircle2 size={13} className="flex-shrink-0 mt-0.5" />}
@@ -461,22 +461,22 @@ function WorkoutDetail({ workout, onBack }: { workout: Workout; onBack: () => vo
         ← Back to workouts
       </button>
 
-      <div className={`bg-gradient-to-br ${workout.color} rounded-2xl p-6 text-white`}>
-        <p className="text-sm font-medium opacity-80 mb-1">{workout.subtitle}</p>
+      <div className="bg-[#1d1d1f] dark:bg-zinc-800 rounded-2xl p-6 text-white">
+        <p className="text-xs font-semibold text-white/50 uppercase tracking-widest mb-2">{workout.subtitle}</p>
         <h2 className="text-2xl font-bold mb-1">{workout.title}</h2>
-        <p className="text-sm opacity-90 mb-4">{workout.tagline}</p>
-        <div className="flex items-center gap-4 text-sm">
-          <span className="flex items-center gap-1.5 bg-white/20 px-3 py-1 rounded-full">
-            <Clock size={13} /> {workout.duration}
+        <p className="text-sm text-white/70 mb-5">{workout.tagline}</p>
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-full text-xs">
+            <Clock size={11} /> {workout.duration}
           </span>
-          <span className="bg-white/20 px-3 py-1 rounded-full">{workout.difficulty}</span>
-          <span className="bg-white/20 px-3 py-1 rounded-full">{workout.exercises.length} exercises</span>
+          <span className="bg-white/10 px-3 py-1 rounded-full text-xs">{workout.difficulty}</span>
+          <span className="bg-white/10 px-3 py-1 rounded-full text-xs">{workout.exercises.length} exercises</span>
         </div>
       </div>
 
-      <div className="bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 flex items-start gap-3">
-        <AlertTriangle size={16} className="text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
-        <div className="text-sm text-amber-800 dark:text-amber-200">
+      <div className="bg-[#f5f5f7] dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-2xl p-4 flex items-start gap-3">
+        <AlertTriangle size={16} className="text-[#6e6e73] dark:text-zinc-400 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-[#1d1d1f] dark:text-zinc-300">
           <strong>Frozen shoulder guidance:</strong> Stop any exercise that causes sharp or worsening pain. Work to the edge of discomfort, never through pain. Warm up the shoulder with a heat pack for 10 minutes beforehand if possible. Progress is slow — consistency over intensity.
         </div>
       </div>
@@ -505,9 +505,9 @@ export function WorkoutsView() {
         <p className="text-gray-500 dark:text-zinc-400 mt-1">Desk-based · Mat, dumbbells, chair, wall, bodyweight · Frozen shoulder friendly</p>
       </div>
 
-      <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-2xl p-4 flex items-start gap-3">
-        <CheckCircle2 size={16} className="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-        <p className="text-sm text-blue-800 dark:text-blue-200">
+      <div className="bg-[#f5f5f7] dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-2xl p-4 flex items-start gap-3">
+        <CheckCircle2 size={16} className="text-[#0071e3] flex-shrink-0 mt-0.5" />
+        <p className="text-sm text-[#1d1d1f] dark:text-zinc-300">
           Every workout includes frozen shoulder modifications. Blue notes = safe with modification. Start with <strong>Shoulder Recovery</strong> daily, then add one other workout 3× per week.
         </p>
       </div>
@@ -519,8 +519,8 @@ export function WorkoutsView() {
             onClick={() => setSelected(w)}
             className="text-left bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 hover:border-gray-200 dark:hover:border-zinc-700 overflow-hidden transition-all hover:shadow-sm group"
           >
-            <div className={`bg-gradient-to-r ${w.color} p-5 text-white`}>
-              <p className="text-xs font-medium opacity-80 mb-0.5">{w.subtitle}</p>
+            <div className="bg-[#1d1d1f] dark:bg-zinc-800 p-5 text-white">
+              <p className="text-xs font-medium text-white/50 mb-0.5">{w.subtitle}</p>
               <h3 className="text-lg font-bold">{w.title}</h3>
             </div>
             <div className="p-4">
@@ -531,7 +531,7 @@ export function WorkoutsView() {
                   <span className="flex items-center gap-1"><Dumbbell size={11} />{w.exercises.length} exercises</span>
                   <span>{w.difficulty}</span>
                 </div>
-                <span className="text-xs font-medium text-blue-600 dark:text-blue-400 group-hover:translate-x-0.5 transition-transform">
+                <span className="text-xs font-medium text-[#0071e3] group-hover:translate-x-0.5 transition-transform">
                   View →
                 </span>
               </div>

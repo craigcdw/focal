@@ -10,17 +10,17 @@ import { format } from "date-fns";
 import { useTimeTracker } from "@/hooks/useTimeTracker";
 
 const PRIORITY_COLORS: Record<Priority, string> = {
-  low: "bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-zinc-300",
-  medium: "bg-yellow-50 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-400",
-  high: "bg-orange-50 text-orange-700 dark:bg-orange-950 dark:text-orange-400",
-  urgent: "bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-400",
+  low:    "bg-[#f5f5f7] text-[#6e6e73] dark:bg-zinc-800 dark:text-zinc-400",
+  medium: "bg-[#f5f5f7] text-[#1d1d1f] dark:bg-zinc-800 dark:text-zinc-300",
+  high:   "bg-[#1d1d1f] text-white dark:bg-zinc-200 dark:text-zinc-900",
+  urgent: "bg-[#1d1d1f] text-white dark:bg-white dark:text-zinc-900",
 };
 
 const PRIORITY_DOT: Record<Priority, string> = {
-  low: "bg-gray-400",
-  medium: "bg-yellow-500",
-  high: "bg-orange-500",
-  urgent: "bg-red-500",
+  low:    "bg-[#d1d1d6]",
+  medium: "bg-[#aeaeb2]",
+  high:   "bg-[#6e6e73]",
+  urgent: "bg-[#1d1d1f] dark:bg-white",
 };
 
 const EMPTY_FORM = {
@@ -232,13 +232,13 @@ export function TasksView() {
               onChange={e => setNlInput(e.target.value)}
               onKeyDown={e => e.key === "Enter" && parseNL()}
               placeholder='Try "Call John tomorrow at 2pm, high priority" or "Write report by Friday #work"'
-              className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-purple-200 dark:border-purple-900 bg-purple-50 dark:bg-purple-950/40 text-gray-900 dark:text-white placeholder-purple-300 dark:placeholder-purple-700 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+              className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-[#f5f5f7] dark:bg-zinc-800 text-[#1d1d1f] dark:text-white placeholder-[#aeaeb2] dark:placeholder-zinc-500 text-sm focus:outline-none focus:ring-2 focus:ring-[#0071e3]"
             />
           </div>
           <button
             onClick={parseNL}
             disabled={nlLoading || !nlInput.trim()}
-            className="flex items-center gap-2 px-4 py-2.5 bg-purple-600 text-white rounded-xl text-sm font-semibold hover:bg-purple-700 disabled:opacity-50 transition-colors"
+            className="flex items-center gap-2 px-4 py-2.5 bg-[#1d1d1f] dark:bg-white text-white dark:text-[#1d1d1f] rounded-xl text-sm font-semibold hover:opacity-80 disabled:opacity-50 transition-opacity"
           >
             {nlLoading ? <Loader2 size={15} className="animate-spin" /> : <Sparkles size={15} />}
             {nlLoading ? "Parsing..." : "Add with AI"}

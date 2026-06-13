@@ -22,82 +22,78 @@ export default async function DashboardPage() {
 
   const name = user?.user_metadata?.full_name?.split(" ")[0] || "there";
 
+  const PRIORITY_DOT: Record<string, string> = {
+    urgent: "bg-[#1d1d1f] dark:bg-white",
+    high:   "bg-[#6e6e73]",
+    medium: "bg-[#aeaeb2]",
+    low:    "bg-[#d1d1d6]",
+  };
+
   return (
-    <div className="space-y-8">
-      {/* Header */}
+    <div className="space-y-8 max-w-5xl">
       <div>
-        <h1 className="text-3xl font-semibold text-gray-900 dark:text-white tracking-tight">
-          {greeting()}, {name}
-        </h1>
-        <p className="text-gray-500 dark:text-zinc-400 mt-1">
+        <p className="text-xs font-semibold text-[#6e6e73] dark:text-zinc-500 uppercase tracking-widest mb-1">
           {format(new Date(), "EEEE, MMMM d")}
         </p>
+        <h1 className="text-3xl font-bold text-[#1d1d1f] dark:text-white tracking-tight">
+          {greeting()}, {name}.
+        </h1>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
-          { label: "Active tasks", value: tasks?.length ?? 0, icon: CheckSquare, color: "blue" },
-          { label: "Upcoming events", value: events?.length ?? 0, icon: Calendar, color: "purple" },
-          { label: "Notes", value: notes?.length ?? 0, icon: FileText, color: "green" },
-          { label: "Focus sessions today", value: sessions?.length ?? 0, icon: Timer, color: "orange" },
-        ].map(({ label, value, icon: Icon, color }) => (
+          { label: "Active tasks", value: tasks?.length ?? 0, icon: CheckSquare },
+          { label: "Upcoming events", value: events?.length ?? 0, icon: Calendar },
+          { label: "Notes", value: notes?.length ?? 0, icon: FileText },
+          { label: "Focus sessions", value: sessions?.length ?? 0, icon: Timer },
+        ].map(({ label, value, icon: Icon }) => (
           <div key={label} className="bg-white dark:bg-zinc-900 rounded-2xl p-5 border border-gray-100 dark:border-zinc-800">
-            <div className={`inline-flex p-2 rounded-xl mb-3 ${
-              color === "blue" ? "bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400" :
-              color === "purple" ? "bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-400" :
-              color === "green" ? "bg-green-50 dark:bg-green-950 text-green-600 dark:text-green-400" :
-              "bg-orange-50 dark:bg-orange-950 text-orange-600 dark:text-orange-400"
-            }`}>
-              <Icon size={18} />
+            <div className="w-8 h-8 rounded-xl bg-[#f5f5f7] dark:bg-zinc-800 flex items-center justify-center mb-3">
+              <Icon size={15} className="text-[#1d1d1f] dark:text-zinc-300" />
             </div>
-            <p className="text-2xl font-semibold text-gray-900 dark:text-white">{value}</p>
-            <p className="text-sm text-gray-500 dark:text-zinc-400 mt-0.5">{label}</p>
+            <p className="text-2xl font-bold text-[#1d1d1f] dark:text-white">{value}</p>
+            <p className="text-xs text-[#6e6e73] dark:text-zinc-400 mt-0.5">{label}</p>
           </div>
         ))}
       </div>
 
-      {/* Content grid */}
-      <div className="grid lg:grid-cols-2 gap-6">
-        {/* Upcoming tasks */}
+      <div className="grid lg:grid-cols-2 gap-4">
+        {/* Active tasks */}
         <div className="bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-gray-100 dark:border-zinc-800">
-          <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-4">Active tasks</h2>
+          <p className="text-xs font-semibold text-[#6e6e73] dark:text-zinc-500 uppercase tracking-widest mb-4">Active tasks</p>
           {tasks && tasks.length > 0 ? (
-            <div className="space-y-2">
+            <div className="space-y-0">
               {tasks.slice(0, 6).map((t) => (
-                <div key={t.id} className="flex items-start gap-3 py-2">
-                  <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${
-                    t.priority === "urgent" ? "bg-red-500" :
-                    t.priority === "high" ? "bg-orange-500" :
-                    t.priority === "medium" ? "bg-yellow-500" : "bg-gray-300"
-                  }`} />
-                  <div className="min-w-0">
-                    <p className="text-sm text-gray-900 dark:text-white truncate">{t.title}</p>
-                    {t.due_date && (
-                      <p className="text-xs text-gray-400 dark:text-zinc-500 mt-0.5">
-                        Due {format(new Date(t.due_date), "MMM d")}
-                      </p>
-                    )}
+                <div key={t.id} className="flex items-center gap-3 py-2.5 border-b border-[#f5f5f7] dark:border-zinc-800 last:border-0">
+                  <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${PRIORITY_DOT[t.priority] ?? "bg-[#d1d1d6]"}`} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-[#1d1d1f] dark:text-white truncate">{t.title}</p>
                   </div>
+                  {t.due_date && (
+                    <p className="text-xs text-[#6e6e73] dark:text-zinc-500 flex-shrink-0">
+                      {format(new Date(t.due_date), "MMM d")}
+                    </p>
+                  )}
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-sm text-gray-400 dark:text-zinc-500">No active tasks — nice work!</p>
+            <p className="text-sm text-[#6e6e73] dark:text-zinc-500">No active tasks — nice work!</p>
           )}
         </div>
 
         {/* Upcoming events */}
         <div className="bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-gray-100 dark:border-zinc-800">
-          <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-4">Upcoming events</h2>
+          <p className="text-xs font-semibold text-[#6e6e73] dark:text-zinc-500 uppercase tracking-widest mb-4">Upcoming events</p>
           {events && events.length > 0 ? (
-            <div className="space-y-3">
+            <div className="space-y-0">
               {events.map((e) => (
-                <div key={e.id} className="flex items-start gap-3">
-                  <div className="w-1 h-full rounded-full flex-shrink-0" style={{ backgroundColor: e.color }} />
-                  <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">{e.title}</p>
-                    <p className="text-xs text-gray-400 dark:text-zinc-500">
+                <div key={e.id} className="flex items-center gap-3 py-2.5 border-b border-[#f5f5f7] dark:border-zinc-800 last:border-0">
+                  <div className="w-1 self-stretch rounded-full flex-shrink-0" style={{ backgroundColor: e.color }} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-[#1d1d1f] dark:text-white truncate">{e.title}</p>
+                    <p className="text-xs text-[#6e6e73] dark:text-zinc-500">
                       {format(new Date(e.start_date), "MMM d, HH:mm")}
                     </p>
                   </div>
@@ -105,41 +101,34 @@ export default async function DashboardPage() {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-gray-400 dark:text-zinc-500">No upcoming events</p>
+            <p className="text-sm text-[#6e6e73] dark:text-zinc-500">No upcoming events</p>
           )}
         </div>
 
         {/* Recent notes */}
         <div className="bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-gray-100 dark:border-zinc-800">
-          <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-4">Recent notes</h2>
+          <p className="text-xs font-semibold text-[#6e6e73] dark:text-zinc-500 uppercase tracking-widest mb-4">Recent notes</p>
           {notes && notes.length > 0 ? (
-            <div className="space-y-2">
+            <div className="space-y-0">
               {notes.map((n) => (
-                <div key={n.id} className="flex items-center justify-between py-1.5">
-                  <p className="text-sm text-gray-900 dark:text-white truncate">{n.title}</p>
-                  <p className="text-xs text-gray-400 dark:text-zinc-500 ml-4 flex-shrink-0">
+                <div key={n.id} className="flex items-center justify-between py-2.5 border-b border-[#f5f5f7] dark:border-zinc-800 last:border-0">
+                  <p className="text-sm text-[#1d1d1f] dark:text-white truncate">{n.title}</p>
+                  <p className="text-xs text-[#6e6e73] dark:text-zinc-500 ml-4 flex-shrink-0">
                     {format(new Date(n.updated_at), "MMM d")}
                   </p>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-sm text-gray-400 dark:text-zinc-500">No notes yet</p>
+            <p className="text-sm text-[#6e6e73] dark:text-zinc-500">No notes yet</p>
           )}
         </div>
 
         {/* Today's focus */}
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-gray-100 dark:border-zinc-800">
-          <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-4">Today&apos;s focus</h2>
-          <div className="flex items-center gap-4">
-            <div className="text-4xl font-semibold text-gray-900 dark:text-white">{sessions?.length ?? 0}</div>
-            <div>
-              <p className="text-sm text-gray-500 dark:text-zinc-400">pomodoro sessions completed</p>
-              <p className="text-xs text-gray-400 dark:text-zinc-500 mt-1">
-                {((sessions?.length ?? 0) * 25)} minutes of deep work
-              </p>
-            </div>
-          </div>
+        <div className="bg-[#1d1d1f] dark:bg-zinc-800 rounded-2xl p-6 border border-transparent">
+          <p className="text-xs font-semibold text-white/50 uppercase tracking-widest mb-4">Today&apos;s focus</p>
+          <p className="text-5xl font-bold text-white mb-1">{sessions?.length ?? 0}</p>
+          <p className="text-sm text-white/60">sessions · {(sessions?.length ?? 0) * 25} min of deep work</p>
         </div>
       </div>
     </div>

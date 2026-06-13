@@ -99,8 +99,8 @@ export function ReportsView() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-semibold text-gray-900 dark:text-white tracking-tight">Reports</h1>
-          <p className="text-gray-500 dark:text-zinc-400 mt-1">Time tracked and productivity insights</p>
+          <h1 className="text-3xl font-bold text-[#1d1d1f] dark:text-white tracking-tight">Reports</h1>
+          <p className="text-[#6e6e73] dark:text-zinc-400 mt-1">Time tracked and productivity insights</p>
         </div>
         <div className="flex gap-2">
           {(["week", "month"] as const).map(r => (
@@ -122,22 +122,17 @@ export function ReportsView() {
       {/* Summary stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "Time tracked", value: fmt(totalSeconds), icon: Clock, color: "blue" },
-          { label: "Time entries", value: entries.length, icon: BarChart2, color: "purple" },
-          { label: "Tasks completed", value: tasksDone, icon: CheckSquare, color: "green" },
-          { label: "Focus sessions", value: pomodoroCount, icon: Timer, color: "orange" },
-        ].map(({ label, value, icon: Icon, color }) => (
+          { label: "Time tracked", value: fmt(totalSeconds), icon: Clock },
+          { label: "Time entries", value: entries.length, icon: BarChart2 },
+          { label: "Tasks completed", value: tasksDone, icon: CheckSquare },
+          { label: "Focus sessions", value: pomodoroCount, icon: Timer },
+        ].map(({ label, value, icon: Icon }) => (
           <div key={label} className="bg-white dark:bg-zinc-900 rounded-2xl p-5 border border-gray-100 dark:border-zinc-800">
-            <div className={`inline-flex p-2 rounded-xl mb-3 ${
-              color === "blue" ? "bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400" :
-              color === "purple" ? "bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-400" :
-              color === "green" ? "bg-green-50 dark:bg-green-950 text-green-600 dark:text-green-400" :
-              "bg-orange-50 dark:bg-orange-950 text-orange-600 dark:text-orange-400"
-            }`}>
-              <Icon size={18} />
+            <div className="w-8 h-8 rounded-xl bg-[#f5f5f7] dark:bg-zinc-800 flex items-center justify-center mb-3">
+              <Icon size={15} className="text-[#1d1d1f] dark:text-zinc-300" />
             </div>
-            <p className="text-2xl font-semibold text-gray-900 dark:text-white">{value}</p>
-            <p className="text-sm text-gray-500 dark:text-zinc-400 mt-0.5">{label}</p>
+            <p className="text-2xl font-bold text-[#1d1d1f] dark:text-white">{value}</p>
+            <p className="text-xs text-[#6e6e73] dark:text-zinc-400 mt-0.5">{label}</p>
           </div>
         ))}
       </div>
@@ -158,11 +153,11 @@ export function ReportsView() {
                 )}
                 <div className="w-full flex items-end justify-center" style={{ height: "100%" }}>
                   <div
-                    className={`w-full rounded-t-lg transition-all duration-300 ${today ? "bg-blue-500" : "bg-blue-200 dark:bg-blue-900"}`}
+                    className={`w-full rounded-t-lg transition-all duration-300 ${today ? "bg-[#1d1d1f] dark:bg-white" : "bg-[#e5e5e7] dark:bg-zinc-700"}`}
                     style={{ height: `${height}%`, minHeight: seconds > 0 ? "4px" : "0" }}
                   />
                 </div>
-                <span className={`text-[10px] font-medium ${today ? "text-blue-600 dark:text-blue-400" : "text-gray-400 dark:text-zinc-500"}`}>
+                <span className={`text-[10px] font-medium ${today ? "text-[#1d1d1f] dark:text-white font-bold" : "text-[#6e6e73] dark:text-zinc-500"}`}>
                   {range === "week" ? format(date, "EEE") : format(date, "d")}
                 </span>
               </div>
@@ -187,7 +182,7 @@ export function ReportsView() {
                 </div>
                 <div className="w-full h-1.5 bg-gray-100 dark:bg-zinc-800 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-blue-500 rounded-full"
+                    className="h-full bg-[#1d1d1f] dark:bg-white rounded-full"
                     style={{ width: `${(seconds / totalSeconds) * 100}%` }}
                   />
                 </div>
