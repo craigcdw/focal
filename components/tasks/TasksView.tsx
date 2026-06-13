@@ -57,7 +57,7 @@ export function TasksView() {
         body: JSON.stringify({ text: nlInput }),
       });
       const data = await res.json();
-      if (data.error) throw new Error(data.error);
+      if (data.error) throw new Error(data.detail || data.error);
       setForm({
         title: data.title ?? "",
         description: data.description ?? "",
@@ -68,8 +68,8 @@ export function TasksView() {
       });
       setNlInput("");
       setShowForm(true);
-    } catch {
-      setNlError("Could not parse task. Try again.");
+    } catch (err) {
+      setNlError(err instanceof Error ? err.message : "Could not parse task. Try again.");
     } finally {
       setNlLoading(false);
     }
