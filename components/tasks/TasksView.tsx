@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Task, Priority, KanbanColumn } from "@/lib/types";
-import { Plus, X, Play, Square, Sparkles, Loader2, Pencil, CheckSquare } from "lucide-react";
+import { Task, Priority, KanbanColumn, Subtask } from "@/lib/types";
+import { Plus, X, Play, Square, Sparkles, Loader2, Pencil, CheckSquare, Clock } from "lucide-react";
 import { DatePicker } from "@/components/ui/DatePicker";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { format } from "date-fns";
 import { useTimeTracker } from "@/hooks/useTimeTracker";
 
@@ -28,6 +29,7 @@ const EMPTY_FORM = {
   priority: "medium" as Priority,
   status: "todo" as KanbanColumn,
   due_date: "",
+  due_time: "",
   tags: "",
 };
 
@@ -37,15 +39,16 @@ export function TasksView() {
   const [showForm, setShowForm] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [filter, setFilter] = useState<KanbanColumn | "all">("all");
+  const [confirm, setConfirm] = useState<{ id: string; type: "task" } | null>(null);
   const supabase = createClient();
   const { activeTaskId, elapsed, formatElapsed, start, stop } = useTimeTracker();
   const [nlInput, setNlInput] = useState("");
   const [nlLoading, setNlLoading] = useState(false);
   const [nlError, setNlError] = useState("");
-
   const [form, setForm] = useState(EMPTY_FORM);
   const [newSubtask, setNewSubtask] = useState("");
-  const [subtasks, setSubtasks] = useState<{ id: string; title: string; completed: boolean }[]>([]);
+  const [newSubtaskTime, setNewSubtaskTime] = useState("");
+  const [subtasks, setSubtasks] = useState<Subtask[]>([]);
 
   useEffect(() => { fetchTasks(); }, []);
 
@@ -67,10 +70,12 @@ export function TasksView() {
         priority: data.priority ?? "medium",
         status: "todo",
         due_date: data.due_date ?? "",
+        due_time: data.due_time ?? "",
         tags: (data.tags ?? []).join(", "),
       });
       setNlInput("");
       setEditingTask(null);
+      setSubtasks([]);
       setShowForm(true);
     } catch (err) {
       setNlError(err instanceof Error ? err.message : "Could not parse task. Try again.");
@@ -98,6 +103,7 @@ export function TasksView() {
       priority: form.priority,
       status: form.status,
       due_date: form.due_date || null,
+      due_time: form.due_time || null,
       tags: form.tags ? form.tags.split(",").map(t => t.trim()).filter(Boolean) : [],
       subtasks,
     }).select().single();
@@ -115,14 +121,19 @@ export function TasksView() {
       priority: form.priority,
       status: form.status,
       due_date: form.due_date || null,
+      due_time: form.due_time || null,
       tags: form.tags ? form.tags.split(",").map(t => t.trim()).filter(Boolean) : [],
       subtasks,
       updated_at: new Date().toISOString(),
     };
     await supabase.from("tasks").update(updates).eq("id", editingTask.id);
-    setTasks(prev => prev.map(t => t.id === editingTask.id ? { ...t, ...updates, due_date: updates.due_date ?? undefined } : t));
+    setTasks(prev => prev.map(t => t.id === editingTask.id
+      ? { ...t, ...updates, due_date: updates.due_date ?? undefined, due_time: updates.due_time ?? undefined }
+      : t
+    ));
     setEditingTask(null);
     setForm(EMPTY_FORM);
+    setSubtasks([]);
   }
 
   function openEdit(task: Task) {
@@ -135,6 +146,7 @@ export function TasksView() {
       priority: task.priority,
       status: task.status,
       due_date: task.due_date ?? "",
+      due_time: (task as any).due_time ?? "",
       tags: task.tags.join(", "),
     });
   }
@@ -145,12 +157,19 @@ export function TasksView() {
     setForm(EMPTY_FORM);
     setSubtasks([]);
     setNewSubtask("");
+    setNewSubtaskTime("");
   }
 
   function addSubtask() {
     if (!newSubtask.trim()) return;
-    setSubtasks(prev => [...prev, { id: crypto.randomUUID(), title: newSubtask.trim(), completed: false }]);
+    setSubtasks(prev => [...prev, {
+      id: crypto.randomUUID(),
+      title: newSubtask.trim(),
+      completed: false,
+      due_time: newSubtaskTime || undefined,
+    }]);
     setNewSubtask("");
+    setNewSubtaskTime("");
   }
 
   function removeSubtask(id: string) {
@@ -166,7 +185,8 @@ export function TasksView() {
   async function deleteTask(id: string) {
     await supabase.from("tasks").delete().eq("id", id);
     setTasks(prev => prev.filter(t => t.id !== id));
-    if (editingTask?.id === id) { setEditingTask(null); setForm(EMPTY_FORM); }
+    if (editingTask?.id === id) { setEditingTask(null); setForm(EMPTY_FORM); setSubtasks([]); }
+    setConfirm(null);
   }
 
   async function updateColumn(id: string, status: KanbanColumn) {
@@ -180,17 +200,25 @@ export function TasksView() {
 
   return (
     <div className="space-y-6">
+      {confirm && (
+        <ConfirmDialog
+          title="Delete task"
+          message="This will permanently delete the task and all its time entries. This cannot be undone."
+          onConfirm={() => deleteTask(confirm.id)}
+          onCancel={() => setConfirm(null)}
+        />
+      )}
+
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-semibold text-gray-900 dark:text-white tracking-tight">Tasks</h1>
           <p className="text-gray-500 dark:text-zinc-400 mt-1">{tasks.filter(t => t.status !== "done").length} active</p>
         </div>
         <button
-          onClick={() => { setEditingTask(null); setForm(EMPTY_FORM); setShowForm(true); }}
+          onClick={() => { setEditingTask(null); setForm(EMPTY_FORM); setSubtasks([]); setShowForm(true); }}
           className="flex items-center gap-2 px-4 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl text-sm font-semibold hover:opacity-80 transition-opacity"
         >
-          <Plus size={16} />
-          New task
+          <Plus size={16} /> New task
         </button>
       </div>
 
@@ -203,7 +231,7 @@ export function TasksView() {
               value={nlInput}
               onChange={e => setNlInput(e.target.value)}
               onKeyDown={e => e.key === "Enter" && parseNL()}
-              placeholder='Try "Call John tomorrow, high priority" or "Write report by Friday #work"'
+              placeholder='Try "Call John tomorrow at 2pm, high priority" or "Write report by Friday #work"'
               className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-purple-200 dark:border-purple-900 bg-purple-50 dark:bg-purple-950/40 text-gray-900 dark:text-white placeholder-purple-300 dark:placeholder-purple-700 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
             />
           </div>
@@ -262,7 +290,7 @@ export function TasksView() {
             rows={2}
             className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-transparent text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
           />
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div>
               <label className="text-xs text-gray-500 dark:text-zinc-400 mb-1.5 block">Priority</label>
               <select
@@ -293,6 +321,15 @@ export function TasksView() {
               <label className="text-xs text-gray-500 dark:text-zinc-400 mb-1.5 block">Due date</label>
               <DatePicker value={form.due_date} onChange={v => setForm(p => ({ ...p, due_date: v }))} placeholder="No due date" />
             </div>
+            <div>
+              <label className="text-xs text-gray-500 dark:text-zinc-400 mb-1.5 block">Due time</label>
+              <input
+                type="time"
+                value={form.due_time}
+                onChange={e => setForm(p => ({ ...p, due_time: e.target.value }))}
+                className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
           </div>
           <input
             value={form.tags}
@@ -300,6 +337,7 @@ export function TasksView() {
             placeholder="Tags (comma separated)"
             className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-transparent text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+
           {/* Subtasks */}
           <div>
             <label className="text-xs text-gray-500 dark:text-zinc-400 mb-2 flex items-center gap-1.5">
@@ -308,8 +346,13 @@ export function TasksView() {
             {subtasks.length > 0 && (
               <div className="space-y-1.5 mb-2">
                 {subtasks.map(s => (
-                  <div key={s.id} className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-zinc-800 rounded-lg">
+                  <div key={s.id} className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-zinc-800 rounded-xl">
                     <span className="flex-1 text-xs text-gray-700 dark:text-zinc-300">{s.title}</span>
+                    {s.due_time && (
+                      <span className="text-xs text-gray-400 dark:text-zinc-500 flex items-center gap-1">
+                        <Clock size={10} />{s.due_time}
+                      </span>
+                    )}
                     <button onClick={() => removeSubtask(s.id)} className="text-gray-300 hover:text-red-500 transition-colors">
                       <X size={12} />
                     </button>
@@ -324,6 +367,12 @@ export function TasksView() {
                 onKeyDown={e => e.key === "Enter" && (e.preventDefault(), addSubtask())}
                 placeholder="Add a subtask…"
                 className="flex-1 px-3 py-2 rounded-xl border border-gray-200 dark:border-zinc-700 bg-transparent text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <input
+                type="time"
+                value={newSubtaskTime}
+                onChange={e => setNewSubtaskTime(e.target.value)}
+                className="px-3 py-2 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-gray-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 w-28"
               />
               <button onClick={addSubtask} className="px-3 py-2 bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 rounded-xl text-xs hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors">
                 Add
@@ -393,7 +442,7 @@ export function TasksView() {
                         <Pencil size={13} />
                       </button>
                       <button
-                        onClick={() => deleteTask(task.id)}
+                        onClick={() => setConfirm({ id: task.id, type: "task" })}
                         className="opacity-0 group-hover:opacity-100 p-1 rounded-lg text-gray-300 dark:text-zinc-600 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950 transition-all"
                         title="Delete task"
                       >
@@ -419,8 +468,10 @@ export function TasksView() {
                       <option value="done">Done</option>
                     </select>
                     {task.due_date && (
-                      <span className="text-xs text-gray-400 dark:text-zinc-500">
-                        Due {format(new Date(task.due_date), "MMM d")}
+                      <span className="text-xs text-gray-400 dark:text-zinc-500 flex items-center gap-1">
+                        <Clock size={10} />
+                        {format(new Date(task.due_date), "MMM d")}
+                        {(task as any).due_time && ` at ${(task as any).due_time}`}
                       </span>
                     )}
                     {task.tags.map(tag => (
@@ -429,19 +480,29 @@ export function TasksView() {
                       </span>
                     ))}
                   </div>
-                  {task.subtasks.length > 0 && (
-                    <div className="mt-3 space-y-1.5 pl-1">
+
+                  {/* Subtasks visible on card */}
+                  {task.subtasks && task.subtasks.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-gray-50 dark:border-zinc-800 space-y-1.5">
+                      <p className="text-xs font-medium text-gray-400 dark:text-zinc-500 mb-1.5">
+                        {task.subtasks.filter(s => s.completed).length}/{task.subtasks.length} subtasks
+                      </p>
                       {task.subtasks.map(sub => (
                         <div key={sub.id} className="flex items-center gap-2">
                           <input
                             type="checkbox"
                             checked={sub.completed}
                             onChange={() => toggleSubtask(task, sub.id)}
-                            className="w-3.5 h-3.5 rounded accent-blue-500"
+                            className="w-3.5 h-3.5 rounded accent-blue-500 flex-shrink-0"
                           />
-                          <span className={`text-xs ${sub.completed ? "line-through text-gray-400 dark:text-zinc-500" : "text-gray-700 dark:text-zinc-300"}`}>
+                          <span className={`text-xs flex-1 ${sub.completed ? "line-through text-gray-400 dark:text-zinc-500" : "text-gray-700 dark:text-zinc-300"}`}>
                             {sub.title}
                           </span>
+                          {sub.due_time && (
+                            <span className="text-xs text-gray-400 dark:text-zinc-500 flex items-center gap-0.5 flex-shrink-0">
+                              <Clock size={9} />{sub.due_time}
+                            </span>
+                          )}
                         </div>
                       ))}
                     </div>

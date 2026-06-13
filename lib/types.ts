@@ -11,6 +11,7 @@ export interface Subtask {
   id: string;
   title: string;
   completed: boolean;
+  due_time?: string;
 }
 
 export interface Task {
@@ -21,6 +22,7 @@ export interface Task {
   priority: Priority;
   status: KanbanColumn;
   due_date?: string;
+  due_time?: string;
   tags: string[];
   subtasks: Subtask[];
   created_at: string;

@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Note, NoteFolder } from "@/lib/types";
 import { Plus, FolderOpen, FileText, X, Search, ChevronDown, Check } from "lucide-react";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { format } from "date-fns";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -130,6 +131,7 @@ export function NotesView() {
   const [showNewFolder, setShowNewFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
   const [newFolderColor, setNewFolderColor] = useState(FOLDER_COLORS[0]);
+  const [confirm, setConfirm] = useState<{ id: string; type: "note" | "folder" } | null>(null);
   const supabase = createClient();
 
   const saveTimeout = { current: null as ReturnType<typeof setTimeout> | null };
@@ -213,8 +215,23 @@ export function NotesView() {
     return matchSearch && matchFolder;
   });
 
+  function handleConfirm() {
+    if (!confirm) return;
+    if (confirm.type === "note") deleteNote(confirm.id);
+    else deleteFolder(confirm.id);
+    setConfirm(null);
+  }
+
   return (
     <div className="flex h-[calc(100vh-8rem)] -mx-8 -my-8">
+      {confirm && (
+        <ConfirmDialog
+          title={confirm.type === "note" ? "Delete note" : "Delete folder"}
+          message={confirm.type === "note" ? "This note will be permanently deleted." : "This folder will be deleted. Notes inside will be moved to no folder."}
+          onConfirm={handleConfirm}
+          onCancel={() => setConfirm(null)}
+        />
+      )}
       {/* Sidebar */}
       <div className="w-72 flex-shrink-0 bg-white dark:bg-zinc-900 border-r border-gray-100 dark:border-zinc-800 flex flex-col">
         {/* Search & new */}
@@ -291,7 +308,7 @@ export function NotesView() {
                 <span className="text-xs text-gray-400">{notes.filter(n => n.folder_id === f.id).length}</span>
               </button>
               <button
-                onClick={() => deleteFolder(f.id)}
+                onClick={() => setConfirm({ id: f.id, type: "folder" })}
                 className="opacity-0 group-hover:opacity-100 p-1 text-gray-300 hover:text-red-500 transition-all ml-1"
               >
                 <X size={11} />
@@ -313,7 +330,7 @@ export function NotesView() {
               <div className="flex items-start justify-between gap-2">
                 <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{note.title || "Untitled"}</p>
                 <button
-                  onClick={e => { e.stopPropagation(); deleteNote(note.id); }}
+                  onClick={e => { e.stopPropagation(); setConfirm({ id: note.id, type: "note" }); }}
                   className="opacity-0 group-hover:opacity-100 text-gray-300 dark:text-zinc-600 hover:text-red-500 transition-all flex-shrink-0"
                 >
                   <X size={13} />
