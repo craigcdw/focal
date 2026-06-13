@@ -12,6 +12,7 @@ import {
   Brain,
   BarChart2,
   Dumbbell,
+  ChefHat,
   Sun,
   Moon,
   LogOut,
@@ -29,6 +30,7 @@ const nav = [
   { href: "/dashboard/pomodoro", label: "Focus", icon: Timer },
   { href: "/dashboard/game", label: "Learn", icon: Brain },
   { href: "/dashboard/workouts", label: "Workouts", icon: Dumbbell },
+  { href: "/dashboard/recipes", label: "Recipes", icon: ChefHat },
   { href: "/dashboard/reports", label: "Reports", icon: BarChart2 },
 ];
 
