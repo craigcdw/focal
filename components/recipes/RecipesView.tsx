@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import {
   Sparkles, Clock, Users, Wallet, ChevronDown, ChevronUp,
   RotateCcw, Loader2, Flame, Leaf, ShoppingBag, Lightbulb,
-  Bookmark, BookmarkCheck, Trash2, BookOpen,
+  Bookmark, BookmarkCheck, Trash2, BookOpen, Mail, ClipboardCopy, Check,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -45,6 +45,37 @@ function persistSaved(recipes: SavedRecipe[]) {
   localStorage.setItem(SAVED_KEY, JSON.stringify(recipes));
 }
 
+function buildEmailBody(recipe: Recipe): string {
+  const ingredients = recipe.ingredients
+    .map(i => `  • ${i.amount} ${i.unit}${i.note ? ` — ${i.note}` : ""}`)
+    .join("\n");
+  const method = recipe.method.map((s, i) => `  ${i + 1}. ${s}`).join("\n");
+  return [
+    recipe.name,
+    recipe.tagline,
+    "",
+    `Prep ${recipe.prepTime} · Cook ${recipe.cookTime} · ${recipe.servings} serving(s) · ~${recipe.estimatedCost}`,
+    "",
+    "INGREDIENTS",
+    ingredients,
+    "",
+    "METHOD",
+    method,
+    ...(recipe.tip ? ["", `TIP: ${recipe.tip}`] : []),
+    "",
+    "—",
+    "Sent from Focal",
+  ].join("\n");
+}
+
+function buildIngredientText(recipe: Recipe): string {
+  return [
+    `${recipe.name} — Ingredients`,
+    "",
+    ...recipe.ingredients.map(i => `• ${i.amount} ${i.unit}${i.note ? ` (${i.note})` : ""}`),
+  ].join("\n");
+}
+
 function RecipeCard({
   recipe, onRefresh, loading, onSave, isSaved,
 }: {
@@ -55,13 +86,41 @@ function RecipeCard({
   isSaved: boolean;
 }) {
   const [showMethod, setShowMethod] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  function copyIngredients() {
+    navigator.clipboard.writeText(buildIngredientText(recipe)).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
+
+  function emailRecipe() {
+    const subject = encodeURIComponent(`Recipe: ${recipe.name}`);
+    const body = encodeURIComponent(buildEmailBody(recipe));
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  }
 
   return (
     <div className="rounded-3xl overflow-hidden bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 shadow-sm">
       {/* Apple-style hero: deep charcoal, crisp white text */}
       <div className="relative bg-[#1d1d1f] dark:bg-black px-7 pt-7 pb-8">
         {/* Top-right actions */}
-        <div className="absolute top-5 right-5 flex gap-2">
+        <div className="absolute top-5 right-5 flex gap-1.5">
+          <button
+            onClick={copyIngredients}
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 text-white/60 hover:bg-white/20 hover:text-white transition-all"
+            title="Copy ingredients"
+          >
+            {copied ? <Check size={14} /> : <ClipboardCopy size={14} />}
+          </button>
+          <button
+            onClick={emailRecipe}
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 text-white/60 hover:bg-white/20 hover:text-white transition-all"
+            title="Email recipe"
+          >
+            <Mail size={14} />
+          </button>
           <button
             onClick={() => onSave(recipe)}
             className={`w-8 h-8 flex items-center justify-center rounded-full transition-all ${
@@ -93,7 +152,7 @@ function RecipeCard({
         )}
 
         {/* Title */}
-        <h2 className="text-[1.65rem] font-bold text-white leading-tight tracking-tight mb-2 pr-20">
+        <h2 className="text-[1.65rem] font-bold text-white leading-tight tracking-tight mb-2 pr-36">
           {recipe.name}
         </h2>
         <p className="text-sm text-white/60 leading-relaxed mb-7 max-w-lg">{recipe.tagline}</p>
