@@ -139,7 +139,7 @@ export function PomodoroTimer() {
   const progress = ((total - secondsLeft) / total) * 100;
 
   const phaseLabel = phase === "work" ? "Focus" : phase === "short_break" ? "Short break" : "Long break";
-  const phaseColor = phase === "work" ? "#0071e3" : phase === "short_break" ? "#34c759" : "#5e5ce6";
+  const phaseColor = phase === "work" ? "#1E4D8C" : phase === "short_break" ? "#34c759" : "#5e5ce6";
 
   const radius = 120;
   const circumference = 2 * Math.PI * radius;
@@ -149,8 +149,8 @@ export function PomodoroTimer() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-[#1d1d1f] dark:text-white tracking-tight">Focus</h1>
-          <p className="text-[#6e6e73] dark:text-zinc-400 mt-1">{todaySessions.length} sessions today</p>
+          <h1 className="text-3xl font-bold text-[#0D1B2A] dark:text-white tracking-tight">Focus</h1>
+          <p className="text-[#5C6370] dark:text-zinc-400 mt-1">{todaySessions.length} sessions today</p>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -205,7 +205,7 @@ export function PomodoroTimer() {
             </p>
             <div className="flex gap-3 mt-4">
               {(["work", "short_break", "work", "short_break"] as const).slice(0, settings.sessions_before_long_break).map((_, i) => (
-                <div key={i} className={`w-2 h-2 rounded-full transition-colors ${i < (sessionsCompleted % settings.sessions_before_long_break) ? "bg-[#0071e3]" : "bg-gray-200 dark:bg-zinc-700"}`} />
+                <div key={i} className={`w-2 h-2 rounded-full transition-colors ${i < (sessionsCompleted % settings.sessions_before_long_break) ? "bg-[#D4A017]" : "bg-gray-200 dark:bg-zinc-700"}`} />
               ))}
             </div>
           </div>

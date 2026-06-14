@@ -99,8 +99,8 @@ export function ReportsView() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-[#1d1d1f] dark:text-white tracking-tight">Reports</h1>
-          <p className="text-[#6e6e73] dark:text-zinc-400 mt-1">Time tracked and productivity insights</p>
+          <h1 className="text-3xl font-bold text-[#0D1B2A] dark:text-white tracking-tight">Reports</h1>
+          <p className="text-[#5C6370] dark:text-zinc-400 mt-1">Time tracked and productivity insights</p>
         </div>
         <div className="flex gap-2">
           {(["week", "month"] as const).map(r => (
@@ -128,11 +128,11 @@ export function ReportsView() {
           { label: "Focus sessions", value: pomodoroCount, icon: Timer },
         ].map(({ label, value, icon: Icon }) => (
           <div key={label} className="bg-white dark:bg-zinc-900 rounded-2xl p-5 border border-gray-100 dark:border-zinc-800">
-            <div className="w-8 h-8 rounded-xl bg-[#f5f5f7] dark:bg-zinc-800 flex items-center justify-center mb-3">
-              <Icon size={15} className="text-[#1d1d1f] dark:text-zinc-300" />
+            <div className="w-8 h-8 rounded-xl bg-[#F5F4EE] dark:bg-zinc-800 flex items-center justify-center mb-3">
+              <Icon size={15} className="text-[#0D1B2A] dark:text-zinc-300" />
             </div>
-            <p className="text-2xl font-bold text-[#1d1d1f] dark:text-white">{value}</p>
-            <p className="text-xs text-[#6e6e73] dark:text-zinc-400 mt-0.5">{label}</p>
+            <p className="text-2xl font-bold text-[#0D1B2A] dark:text-white">{value}</p>
+            <p className="text-xs text-[#5C6370] dark:text-zinc-400 mt-0.5">{label}</p>
           </div>
         ))}
       </div>
@@ -153,11 +153,11 @@ export function ReportsView() {
                 )}
                 <div className="w-full flex items-end justify-center" style={{ height: "100%" }}>
                   <div
-                    className={`w-full rounded-t-lg transition-all duration-300 ${today ? "bg-[#1d1d1f] dark:bg-white" : "bg-[#e5e5e7] dark:bg-zinc-700"}`}
+                    className={`w-full rounded-t-lg transition-all duration-300 ${today ? "bg-[#D4A017]" : "bg-[#e5e5e7] dark:bg-zinc-700"}`}
                     style={{ height: `${height}%`, minHeight: seconds > 0 ? "4px" : "0" }}
                   />
                 </div>
-                <span className={`text-[10px] font-medium ${today ? "text-[#1d1d1f] dark:text-white font-bold" : "text-[#6e6e73] dark:text-zinc-500"}`}>
+                <span className={`text-[10px] font-medium ${today ? "text-[#D4A017] font-bold" : "text-[#5C6370] dark:text-zinc-500"}`}>
                   {range === "week" ? format(date, "EEE") : format(date, "d")}
                 </span>
               </div>
@@ -182,7 +182,7 @@ export function ReportsView() {
                 </div>
                 <div className="w-full h-1.5 bg-gray-100 dark:bg-zinc-800 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-[#1d1d1f] dark:bg-white rounded-full"
+                    className="h-full bg-[#1E4D8C] dark:bg-[#1E4D8C] rounded-full"
                     style={{ width: `${(seconds / totalSeconds) * 100}%` }}
                   />
                 </div>

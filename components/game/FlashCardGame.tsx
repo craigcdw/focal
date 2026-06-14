@@ -430,8 +430,8 @@ export function FlashCardGame() {
         <div className="bg-white dark:bg-zinc-900 rounded-2xl p-5 border border-gray-100 dark:border-zinc-800">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-[#1d1d1f] dark:bg-white flex items-center justify-center">
-                <span className="text-xs font-bold text-white dark:text-[#1d1d1f]">{level}</span>
+              <div className="w-8 h-8 rounded-full bg-[#0D1B2A] dark:bg-white flex items-center justify-center">
+                <span className="text-xs font-bold text-white dark:text-[#0D1B2A]">{level}</span>
               </div>
               <div>
                 <p className="text-sm font-semibold text-gray-900 dark:text-white">Level {level}</p>
@@ -444,7 +444,7 @@ export function FlashCardGame() {
             </div>
           </div>
           <div className="w-full h-2 bg-gray-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-            <div className="h-full bg-[#0071e3] rounded-full transition-all duration-500" style={{ width: `${xpInLevel}%` }} />
+            <div className="h-full bg-[#D4A017] rounded-full transition-all duration-500" style={{ width: `${xpInLevel}%` }} />
           </div>
           <p className="text-xs text-gray-400 dark:text-zinc-500 mt-1.5">{xpInLevel}/100 XP to Level {level + 1}</p>
         </div>
@@ -454,7 +454,7 @@ export function FlashCardGame() {
           <div className="space-y-2">
             <button
               onClick={() => startQuiz("all")}
-              className="w-full flex items-center justify-between p-4 bg-[#1d1d1f] dark:bg-white rounded-2xl text-white dark:text-[#1d1d1f] hover:opacity-90 transition-opacity"
+              className="w-full flex items-center justify-between p-4 bg-[#0D1B2A] dark:bg-white rounded-2xl text-white dark:text-[#0D1B2A] hover:opacity-90 transition-opacity"
             >
               <div className="flex items-center gap-3">
                 <Brain size={20} />
@@ -523,7 +523,7 @@ export function FlashCardGame() {
         </div>
 
         <div className="w-full h-1.5 bg-gray-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-          <div className="h-full bg-[#0071e3] rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
+          <div className="h-full bg-[#1E4D8C] rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
         </div>
 
         <div className="flex items-center gap-2">

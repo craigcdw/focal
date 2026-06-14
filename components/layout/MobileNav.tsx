@@ -30,8 +30,8 @@ export function MobileNav() {
               href={href}
               className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-colors ${
                 active
-                  ? "text-blue-600 dark:text-blue-400"
-                  : "text-gray-400 dark:text-zinc-500"
+                  ? "text-[#D4A017]"
+                  : "text-[#5C6370] dark:text-zinc-500"
               }`}
             >
               <Icon size={20} strokeWidth={active ? 2 : 1.5} />
