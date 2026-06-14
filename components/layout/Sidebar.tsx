@@ -20,6 +20,7 @@ import {
 import { useTheme } from "next-themes";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { FocalIcon } from "@/components/ui/FocalLogo";
 
 const nav = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -48,7 +49,8 @@ export function Sidebar() {
   return (
     <aside className="hidden md:flex w-64 h-screen fixed left-0 top-0 flex-col bg-white/90 dark:bg-zinc-950/90 backdrop-blur-xl border-r border-gray-100 dark:border-zinc-800 z-40">
       {/* Logo */}
-      <div className="px-6 py-5 border-b border-gray-100 dark:border-zinc-800">
+      <div className="px-5 py-4 border-b border-gray-100 dark:border-zinc-800 flex items-center gap-2.5">
+        <FocalIcon size={30} />
         <span className="text-xl font-semibold tracking-tight text-[#0D1B2A] dark:text-white">
           Focal<span className="text-[#D4A017]">.</span>
         </span>
