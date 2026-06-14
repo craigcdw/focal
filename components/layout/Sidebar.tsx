@@ -13,6 +13,7 @@ import {
   BarChart2,
   Dumbbell,
   ChefHat,
+  FolderKanban,
   Sun,
   Moon,
   LogOut,
@@ -33,6 +34,7 @@ const nav = [
   { href: "/dashboard/workouts", label: "Workouts", icon: Dumbbell },
   { href: "/dashboard/recipes", label: "Recipes", icon: ChefHat },
   { href: "/dashboard/reports", label: "Reports", icon: BarChart2 },
+  { href: "/dashboard/projects", label: "Projects", icon: FolderKanban },
 ];
 
 export function Sidebar() {
