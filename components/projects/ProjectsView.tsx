@@ -476,6 +476,7 @@ export function ProjectsView() {
   const [sections, setSections] = useState<ProjectSection[]>([]);
   const [loading, setLoading]   = useState(true);
   const [navOpen, setNavOpen]   = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const supabase = createClient();
 
   const loadData = useCallback(async () => {
@@ -488,7 +489,7 @@ export function ProjectsView() {
         .select("checks")
         .eq("user_id", user.id)
         .eq("project_slug", "bp-agent-factory")
-        .single(),
+        .maybeSingle(),                           // safe when no row exists yet
       supabase
         .from("project_sections")
         .select("section_id, section_order, data")
@@ -499,18 +500,25 @@ export function ProjectsView() {
     if (progressRes.data?.checks) setChecks(progressRes.data.checks as Checks);
     if (sectionsRes.data) setSections(sectionsRes.data as ProjectSection[]);
     setLoading(false);
-  }, [supabase]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => { loadData(); }, [loadData]);
 
   const saveProgress = useCallback(async (newChecks: Checks) => {
+    setSaveError(null);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-    await supabase.from("project_progress").upsert(
+    const { error } = await supabase.from("project_progress").upsert(
       { user_id: user.id, project_slug: "bp-agent-factory", checks: newChecks, updated_at: new Date().toISOString() },
       { onConflict: "user_id,project_slug" }
     );
-  }, [supabase]);
+    if (error) {
+      console.error("project_progress save failed:", error);
+      setSaveError(error.message);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function onCheck(id: string, val: boolean) {
     const updated = { ...checks, [id]: val };
@@ -540,6 +548,13 @@ export function ProjectsView() {
 
   return (
     <div className="space-y-5">
+
+      {/* Save error banner */}
+      {saveError && (
+        <div className="rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 px-4 py-2 text-xs text-red-700 dark:text-red-300">
+          <strong>Save failed:</strong> {saveError} — check Supabase RLS policies for project_progress.
+        </div>
+      )}
 
       {/* Sticky progress bar */}
       <div className="sticky top-0 z-20 -mx-4 md:-mx-8 px-4 md:px-8 py-3 bg-white/90 dark:bg-zinc-950/90 backdrop-blur-xl border-b border-gray-100 dark:border-zinc-800 flex items-center gap-4">
