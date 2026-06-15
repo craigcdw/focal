@@ -325,6 +325,7 @@ type Tab = "daily" | "pantry" | "saved";
 export function RecipesView() {
   const [tab, setTab] = useState<Tab>("daily");
   const [savedRecipes, setSavedRecipes] = useState<SavedRecipe[]>([]);
+  const [selectedProtein, setSelectedProtein] = useState<string | null>(null);
 
   const [dailyRecipe, setDailyRecipe] = useState<Recipe | null>(null);
   const [dailyLoading, setDailyLoading] = useState(true);
@@ -372,7 +373,7 @@ export function RecipesView() {
       const res = await fetch("/api/suggest-recipe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "daily", date: today }),
+        body: JSON.stringify({ type: "daily", date: today, protein: selectedProtein }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.detail || data.error);
@@ -399,7 +400,7 @@ export function RecipesView() {
       const res = await fetch("/api/suggest-recipe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "pantry", ingredients: pantryInput }),
+        body: JSON.stringify({ type: "pantry", ingredients: pantryInput, protein: selectedProtein }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.detail || data.error);
@@ -439,6 +440,28 @@ export function RecipesView() {
           </button>
         ))}
       </div>
+
+      {/* Protein quick-pick */}
+      {tab !== "saved" && (
+        <div className="space-y-1.5">
+          <p className="text-xs text-[#5C6370] dark:text-zinc-500 font-medium">Protein</p>
+          <div className="flex flex-wrap gap-2">
+            {["Chicken thighs", "Salmon", "Beef mince", "Lamb", "Prawns", "Eggs", "Halloumi", "Pork belly", "Tuna steak"].map(p => (
+              <button
+                key={p}
+                onClick={() => setSelectedProtein(prev => prev === p ? null : p)}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
+                  selectedProtein === p
+                    ? "bg-[#1E4D8C] text-white border-[#1E4D8C]"
+                    : "bg-white dark:bg-zinc-900 text-[#5C6370] dark:text-zinc-400 border-gray-200 dark:border-zinc-700 hover:border-[#1E4D8C] hover:text-[#1E4D8C]"
+                }`}
+              >
+                {p}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Tonight */}
       {tab === "daily" && (
