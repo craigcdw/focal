@@ -266,7 +266,12 @@ export function CalendarView() {
                       </div>
                     ))}
                     {dayEvents.length > 3 && (
-                      <div className="text-xs text-gray-400 dark:text-zinc-500 pl-1">+{dayEvents.length - 3} more</div>
+                      <div
+                        onClick={ev => { ev.stopPropagation(); setCurrent(day); setView("day"); }}
+                        className="text-xs text-blue-500 dark:text-blue-400 pl-1 cursor-pointer hover:underline"
+                      >
+                        +{dayEvents.length - 3} more
+                      </div>
                     )}
                   </div>
                 </div>
