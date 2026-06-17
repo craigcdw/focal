@@ -34,7 +34,7 @@ export function CalendarView() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [editingEvent, setEditingEvent] = useState(false);
-  const [editForm, setEditForm] = useState({ title: "", description: "", start_time: "", end_time: "", reminder_enabled: true });
+  const [editForm, setEditForm] = useState({ title: "", description: "", date: "", start_time: "", end_time: "", reminder_enabled: true });
   const [snoozed, setSnoozed] = useState<Set<string>>(new Set());
   const supabase = createClient();
 
@@ -107,15 +107,18 @@ export function CalendarView() {
 
   async function saveEventEdit() {
     if (!selectedEvent) return;
-    const startBase = selectedEvent.start_date.split("T")[0];
-    const endBase = selectedEvent.end_date.split("T")[0];
+    const dateBase = editForm.date || selectedEvent.start_date.split("T")[0];
     const updates: Partial<CalendarEvent> = {
       title: editForm.title,
       description: editForm.description,
       reminder_enabled: editForm.reminder_enabled,
       ...(!selectedEvent.all_day && editForm.start_time ? {
-        start_date: new Date(`${startBase}T${editForm.start_time}`).toISOString(),
-        end_date: new Date(`${endBase}T${editForm.end_time}`).toISOString(),
+        start_date: new Date(`${dateBase}T${editForm.start_time}`).toISOString(),
+        end_date: new Date(`${dateBase}T${editForm.end_time}`).toISOString(),
+      } : {}),
+      ...(selectedEvent.all_day && editForm.date ? {
+        start_date: `${editForm.date}T00:00:00.000Z`,
+        end_date: `${editForm.date}T23:59:59.000Z`,
       } : {}),
     };
     await supabase.from("calendar_events").update(updates).eq("id", selectedEvent.id);
@@ -128,6 +131,7 @@ export function CalendarView() {
     setEditForm({
       title: event.title,
       description: event.description ?? "",
+      date: event.start_date.split("T")[0],
       start_time: event.all_day ? "" : format(parseISO(event.start_date), "HH:mm"),
       end_time: event.all_day ? "" : format(parseISO(event.end_date), "HH:mm"),
       reminder_enabled: event.reminder_enabled ?? true,
@@ -358,6 +362,11 @@ export function CalendarView() {
                   rows={2}
                   className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-zinc-700 bg-transparent text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                 />
+                <div>
+                  <label className="text-xs text-gray-500 dark:text-zinc-400 mb-1 block">Date</label>
+                  <input type="date" value={editForm.date} onChange={e => setEditForm(p => ({ ...p, date: e.target.value }))}
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
                 {!selectedEvent.all_day && (
                   <div className="grid grid-cols-2 gap-3">
                     <div>
