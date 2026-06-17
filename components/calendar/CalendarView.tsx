@@ -311,7 +311,7 @@ export function CalendarView() {
           ) : (
             <div className="space-y-3">
               {getEventsForDay(current).map(e => (
-                <div key={e.id} className="flex items-start gap-3 group">
+                <div key={e.id} onClick={() => setSelectedEvent(e)} className="flex items-start gap-3 group cursor-pointer hover:bg-gray-50 dark:hover:bg-zinc-800 rounded-xl px-2 py-1 -mx-2 transition-colors">
                   <div className="w-1 h-full min-h-10 rounded-full flex-shrink-0" style={{ backgroundColor: e.color }} />
                   <div className="flex-1">
                     <p className="font-medium text-gray-900 dark:text-white">{e.title}</p>
@@ -322,7 +322,7 @@ export function CalendarView() {
                     )}
                     {e.description && <p className="text-sm text-gray-500 dark:text-zinc-400 mt-1">{e.description}</p>}
                   </div>
-                  <button onClick={() => deleteEvent(e.id)} className="opacity-0 group-hover:opacity-100 text-gray-300 hover:text-red-500 transition-all">
+                  <button onClick={ev => { ev.stopPropagation(); deleteEvent(e.id); }} className="opacity-0 group-hover:opacity-100 text-gray-300 hover:text-red-500 transition-all">
                     <X size={15} />
                   </button>
                 </div>
