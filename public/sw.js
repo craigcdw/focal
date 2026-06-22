@@ -1,3 +1,22 @@
+// ── Push notifications ────────────────────────────────────────────────────────
+self.addEventListener("push", (event) => {
+  const data = event.data?.json() ?? {};
+  event.waitUntil(
+    self.registration.showNotification(data.title ?? "Focal reminder", {
+      body: data.body ?? "",
+      icon: "/icon.svg",
+      tag: data.tag ?? "focal-reminder",
+      renotify: true,
+    })
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  event.waitUntil(clients.openWindow("/dashboard/calendar"));
+});
+
+// ── Cache ─────────────────────────────────────────────────────────────────────
 const CACHE = "focal-v1";
 const OFFLINE_URL = "/offline";
 
