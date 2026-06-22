@@ -8,7 +8,7 @@ export function NotificationBanner() {
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
-    if ("Notification" in window) {
+    if (typeof window !== "undefined" && "Notification" in window) {
       setPermission(Notification.permission);
     }
   }, []);
@@ -21,7 +21,6 @@ export function NotificationBanner() {
     if (result === "granted") {
       new Notification("Focal notifications enabled", {
         body: "You'll get reminders 15 min, 5 min, and 1 min before events.",
-        icon: "/icon-192.png",
       });
     }
   }

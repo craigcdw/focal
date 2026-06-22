@@ -11,7 +11,7 @@ type NotifyKey = string; // `${id}-${alertLabel}` e.g. "abc-15min"
 function fireNotification(title: string, body: string) {
   playReminderChime();
   if ("Notification" in window && Notification.permission === "granted") {
-    new Notification(title, { body, icon: "/icon-192.png" });
+    new Notification(title, { body });
   }
 }
 
