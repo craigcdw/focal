@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { EventReminderWatcher } from "@/components/layout/EventReminderWatcher";
+import { NotificationBanner } from "@/components/layout/NotificationBanner";
 import { Footer } from "@/components/layout/Footer";
 import { FocalIcon } from "@/components/ui/FocalLogo";
 
@@ -30,6 +31,7 @@ export default async function DashboardLayout({
           </span>
         </div>
         <div className="max-w-6xl mx-auto px-4 md:px-8 py-6 md:py-8">
+          <NotificationBanner />
           {children}
           <Footer />
         </div>
