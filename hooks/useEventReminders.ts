@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { CalendarEvent, Task } from "@/lib/types";
+import { CalendarEvent } from "@/lib/types";
 import { parseISO, differenceInMinutes, format, isToday } from "date-fns";
 import { playReminderChime } from "@/lib/audio";
 
@@ -68,7 +68,7 @@ export function useEventReminders() {
 
         if (dueTasks && dueTasks.length > 0) {
           notified.current.add(taskKey);
-          const names = dueTasks.slice(0, 3).map((t: Task) => t.title).join(", ");
+          const names = dueTasks.slice(0, 3).map((t) => t.title as string).join(", ");
           const extra = dueTasks.length > 3 ? ` +${dueTasks.length - 3} more` : "";
           fireNotification(
             `📋 ${dueTasks.length} task${dueTasks.length > 1 ? "s" : ""} due today`,
