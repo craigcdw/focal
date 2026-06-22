@@ -247,7 +247,7 @@ export function CalendarView() {
                   onClick={() => { setSelectedDate(day); setForm(p => ({ ...p, start_date: format(day, "yyyy-MM-dd") })); setShowForm(true); }}
                   className={`min-h-24 p-2 border-b border-r border-gray-50 dark:border-zinc-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors ${
                     !inMonth ? "opacity-40" : ""
-                  }`}
+                  } ${isToday(day) ? "bg-blue-50/60 dark:bg-blue-950/20" : ""}`}
                 >
                   <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-sm font-medium ${
                     isToday(day) ? "bg-blue-500 text-white" : "text-gray-700 dark:text-zinc-200"

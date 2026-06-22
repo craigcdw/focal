@@ -71,9 +71,9 @@ begin
     'high', 'todo',
     array['brightprompt','week-1'],
     jsonb_build_array(
-      jsonb_build_object('id', gen_random_uuid()::text, 'title', 'Rapid Assessment (£500) — one-pager written, pricing rationale documented, delivery template ready', 'completed', false),
-      jsonb_build_object('id', gen_random_uuid()::text, 'title', 'AI Readiness Package (£3,500) — scope doc written, deliverables listed, proposal template built', 'completed', false),
-      jsonb_build_object('id', gen_random_uuid()::text, 'title', 'Agent of Record (£9,500/month) — retainer contract drafted, monthly touchpoint agenda defined', 'completed', false)
+      jsonb_build_object('id', gen_random_uuid()::text, 'title', 'Rapid Assessment (�R500) — one-pager written, pricing rationale documented, delivery template ready', 'completed', false),
+      jsonb_build_object('id', gen_random_uuid()::text, 'title', 'AI Readiness Package (�R3,500) — scope doc written, deliverables listed, proposal template built', 'completed', false),
+      jsonb_build_object('id', gen_random_uuid()::text, 'title', 'Agent of Record (�R9,500/month) — retainer contract drafted, monthly touchpoint agenda defined', 'completed', false)
     )
   );
 
@@ -156,7 +156,7 @@ begin
   insert into tasks (user_id, title, description, priority, status, tags, subtasks) values (
     v_uid,
     'Close first engagement',
-    'Convert a discovery call to a signed contract. Target: Rapid Assessment (£500) or AI Readiness Package (£3,500).',
+    'Convert a discovery call to a signed contract. Target: Rapid Assessment (�R500) or AI Readiness Package (�R3,500).',
     'urgent', 'backlog',
     array['brightprompt','week-4'],
     jsonb_build_array(
@@ -205,8 +205,8 @@ begin
       jsonb_build_object('id', gen_random_uuid()::text, 'title', 'Month 1: PIL BA Agent live in Teams and signed off by client', 'completed', false),
       jsonb_build_object('id', gen_random_uuid()::text, 'title', 'Month 2: Artefact library complete — all 6 templates built and stored in OneDrive', 'completed', false),
       jsonb_build_object('id', gen_random_uuid()::text, 'title', 'Month 2: 3 active client engagements running concurrently', 'completed', false),
-      jsonb_build_object('id', gen_random_uuid()::text, 'title', 'Month 3: First Agent of Record retainer (£9,500/month) signed', 'completed', false),
-      jsonb_build_object('id', gen_random_uuid()::text, 'title', 'Month 3: £10K+ MRR achieved — pipeline strong enough to sustain without new outreach for 30 days', 'completed', false)
+      jsonb_build_object('id', gen_random_uuid()::text, 'title', 'Month 3: First Agent of Record retainer (�R9,500/month) signed', 'completed', false),
+      jsonb_build_object('id', gen_random_uuid()::text, 'title', 'Month 3: �R10K+ MRR achieved — pipeline strong enough to sustain without new outreach for 30 days', 'completed', false)
     )
   );
 

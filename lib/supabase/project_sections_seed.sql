@@ -17,7 +17,7 @@ insert into project_sections (project_slug, section_id, section_order, data) val
       "stats": [
         {"v": "15K", "l": "LinkedIn connections"},
         {"v": "5",   "l": "Active bots target"},
-        {"v": "£175K","l": "Annual revenue target"},
+        {"v": "�R175K","l": "Annual revenue target"},
         {"v": "60 days","l": "Pipeline to first close"}
       ],
       "notes": [
@@ -107,7 +107,7 @@ insert into project_sections (project_slug, section_id, section_order, data) val
     {
       "type": "note",
       "variant": "info",
-      "content": "Each engagement starts with a fixed-fee Rapid Assessment (£500). This funds discovery, de-risks the client, and creates the brief for the full engagement."
+      "content": "Each engagement starts with a fixed-fee Rapid Assessment (�R500). This funds discovery, de-risks the client, and creates the brief for the full engagement."
     }
   ]
 }$j$::jsonb),
@@ -123,7 +123,7 @@ insert into project_sections (project_slug, section_id, section_order, data) val
       "items": [
         {"title":"Initial Outreach",   "date":"Day 1",        "dep":"LinkedIn connection + personalised message referencing a specific pain point in their sector.",               "output":"Connection accepted & reply"},
         {"title":"Discovery Call",     "date":"Days 3–5",     "dep":"30-min call. Ask: What's slowing your team? Where are you losing hours? What does good look like?",           "output":"Pain points mapped"},
-        {"title":"Rapid Assessment",   "date":"Days 7–10",    "dep":"Fixed-fee £500. 2-hour structured session. Deliver: AI Readiness Score + Quick Wins Report.",                 "output":"Assessment report delivered"},
+        {"title":"Rapid Assessment",   "date":"Days 7–10",    "dep":"Fixed-fee �R500. 2-hour structured session. Deliver: AI Readiness Score + Quick Wins Report.",                 "output":"Assessment report delivered"},
         {"title":"Proposal",           "date":"Days 12–15",   "dep":"Tailored scope based on assessment. Choose from 3-tier pricing. Include ROI estimate.",                       "output":"Proposal sent & followed up"},
         {"title":"Onboarding",         "date":"Days 17–21",   "dep":"Contract signed. Kick-off call. Access granted to systems. Project plan shared.",                             "output":"Project live"},
         {"title":"Build & Deliver",    "date":"Weeks 4–6",    "dep":"Agents built, tested, and reviewed with client. Iterate on feedback.",                                        "output":"Agents deployed"},
@@ -224,18 +224,18 @@ insert into project_sections (project_slug, section_id, section_order, data) val
     {
       "type": "pricing",
       "items": [
-        {"title":"Rapid Assessment",    "price":"£500",         "period":"Fixed fee · 1 day",           "badge":"Entry point",   "badgeVariant":"gold",  "desc":"Structured 2-hour session. AI Readiness Score (10 dimensions). Quick Wins Report (3 immediate opportunities). Written briefing for next step."},
-        {"title":"AI Readiness Package","price":"£3,500",       "period":"Fixed fee · 30 days",         "badge":"Most popular",  "badgeVariant":"blue",  "desc":"Full agent scoped and deployed. Process redesign documentation. Staff training session. 30-day support included."},
-        {"title":"Agent of Record",     "price":"£9,500",       "period":"Per month · 3-month min",     "badge":"Highest value", "badgeVariant":"green", "desc":"Ongoing fractional AI partner. Multiple agents in scope. Monthly optimisation cycle. Quarterly strategy review."}
+        {"title":"Rapid Assessment",    "price":"�R500",         "period":"Fixed fee · 1 day",           "badge":"Entry point",   "badgeVariant":"gold",  "desc":"Structured 2-hour session. AI Readiness Score (10 dimensions). Quick Wins Report (3 immediate opportunities). Written briefing for next step."},
+        {"title":"AI Readiness Package","price":"�R3,500",       "period":"Fixed fee · 30 days",         "badge":"Most popular",  "badgeVariant":"blue",  "desc":"Full agent scoped and deployed. Process redesign documentation. Staff training session. 30-day support included."},
+        {"title":"Agent of Record",     "price":"�R9,500",       "period":"Per month · 3-month min",     "badge":"Highest value", "badgeVariant":"green", "desc":"Ongoing fractional AI partner. Multiple agents in scope. Monthly optimisation cycle. Quarterly strategy review."}
       ]
     },
     {
       "type": "checklist",
       "label": "Offer documentation checklist",
       "items": [
-        {"id":"of-0","label":"Rapid Assessment (£500) — one-pager written, pricing rationale documented, delivery template ready"},
-        {"id":"of-1","label":"AI Readiness Package (£3,500) — scope doc written, deliverables listed, proposal template built"},
-        {"id":"of-2","label":"Agent of Record (£9,500/month) — retainer contract drafted, monthly touchpoint agenda defined"}
+        {"id":"of-0","label":"Rapid Assessment (�R500) — one-pager written, pricing rationale documented, delivery template ready"},
+        {"id":"of-1","label":"AI Readiness Package (�R3,500) — scope doc written, deliverables listed, proposal template built"},
+        {"id":"of-2","label":"Agent of Record (�R9,500/month) — retainer contract drafted, monthly touchpoint agenda defined"}
       ]
     }
   ]
@@ -359,7 +359,7 @@ insert into project_sections (project_slug, section_id, section_order, data) val
         {
           "type": "copybox",
           "label": "ChatGPT Custom GPT — Proposal Generator",
-          "content": "You are the BrightPrompt Proposal Generator. When given a client brief, produce a professional proposal document.\n\nStructure the proposal as follows:\n1. Executive Summary (2–3 sentences — what we'll do and why it matters)\n2. The Problem (restate their pain in their language)\n3. Our Solution (what we'll build, how it works, what changes)\n4. Scope & Deliverables (bullet list — be specific)\n5. Pricing (choose from 3 tiers based on scope — Rapid Assessment £500, AI Readiness Package £3,500, Agent of Record £9,500/month)\n6. ROI Estimate (time saved × hourly rate × team size)\n7. Timeline (phases with weeks)\n8. Next Step (single clear CTA)\n\nWrite in professional but accessible UK English. Avoid jargon. Use numbers wherever possible."
+          "content": "You are the BrightPrompt Proposal Generator. When given a client brief, produce a professional proposal document.\n\nStructure the proposal as follows:\n1. Executive Summary (2–3 sentences — what we'll do and why it matters)\n2. The Problem (restate their pain in their language)\n3. Our Solution (what we'll build, how it works, what changes)\n4. Scope & Deliverables (bullet list — be specific)\n5. Pricing (choose from 3 tiers based on scope — Rapid Assessment �R500, AI Readiness Package �R3,500, Agent of Record �R9,500/month)\n6. ROI Estimate (time saved × hourly rate × team size)\n7. Timeline (phases with weeks)\n8. Next Step (single clear CTA)\n\nWrite in professional but accessible UK English. Avoid jargon. Use numbers wherever possible."
         }
       ]
     },
@@ -514,14 +514,14 @@ insert into project_sections (project_slug, section_id, section_order, data) val
       "type": "table",
       "headers": ["Licence","Monthly (est.)","Key AI Features","Best for"],
       "rows": [
-        ["M365 Business Basic",    "£5/user",  "Teams, SharePoint, web apps",                                         "Minimum viable comms"],
-        ["M365 Business Standard", "£10/user", "+ Copilot for M365 add-on eligible, full Office",                     "Most SME clients"],
-        ["M365 Business Premium",  "£18/user", "+ Intune, Defender, Entra ID P1",                                     "Compliance-sensitive clients"],
-        ["M365 E3",                "£28/user", "Enterprise identity, audit logs, full DLP",                           "Financial services regulated"],
-        ["M365 E5",                "£52/user", "+ Purview, Sentinel, Defender for Endpoint",                          "FCA/PRA regulated firms"],
-        ["Copilot for M365 add-on","£25/user", "Copilot in Word, Excel, Teams, Outlook",                             "Knowledge workers (add to any E3/E5)"],
-        ["Power Platform (per app)","£16/user","1 app/flow per user",                                                 "Targeted automation projects"],
-        ["Power Platform (per user)","£36/user","Unlimited apps + flows",                                             "Heavy automation clients"]
+        ["M365 Business Basic",    "�R5/user",  "Teams, SharePoint, web apps",                                         "Minimum viable comms"],
+        ["M365 Business Standard", "�R10/user", "+ Copilot for M365 add-on eligible, full Office",                     "Most SME clients"],
+        ["M365 Business Premium",  "�R18/user", "+ Intune, Defender, Entra ID P1",                                     "Compliance-sensitive clients"],
+        ["M365 E3",                "�R28/user", "Enterprise identity, audit logs, full DLP",                           "Financial services regulated"],
+        ["M365 E5",                "�R52/user", "+ Purview, Sentinel, Defender for Endpoint",                          "FCA/PRA regulated firms"],
+        ["Copilot for M365 add-on","�R25/user", "Copilot in Word, Excel, Teams, Outlook",                             "Knowledge workers (add to any E3/E5)"],
+        ["Power Platform (per app)","�R16/user","1 app/flow per user",                                                 "Targeted automation projects"],
+        ["Power Platform (per user)","�R36/user","Unlimited apps + flows",                                             "Heavy automation clients"]
       ]
     },
     {
@@ -603,7 +603,7 @@ insert into project_sections (project_slug, section_id, section_order, data) val
     {
       "type": "copybox",
       "label": "Discovery call debrief prompt",
-      "content": "I've just finished a discovery call. Here are my rough notes. Please:\n\n1. Summarise the key pain points in order of urgency\n2. Identify the 3 most promising AI opportunities\n3. Recommend which BrightPrompt offer tier fits best (Rapid Assessment £500 / AI Readiness Package £3,500 / Agent of Record £9,500/month)\n4. Draft 3 bullet points for a follow-up email\n5. Flag any red flags or risks I should address\n\nCall notes:\n[PASTE NOTES]"
+      "content": "I've just finished a discovery call. Here are my rough notes. Please:\n\n1. Summarise the key pain points in order of urgency\n2. Identify the 3 most promising AI opportunities\n3. Recommend which BrightPrompt offer tier fits best (Rapid Assessment �R500 / AI Readiness Package �R3,500 / Agent of Record �R9,500/month)\n4. Draft 3 bullet points for a follow-up email\n5. Flag any red flags or risks I should address\n\nCall notes:\n[PASTE NOTES]"
     }
   ]
 }$j$::jsonb),
@@ -622,7 +622,7 @@ insert into project_sections (project_slug, section_id, section_order, data) val
         {"value":"5",      "label":"Discovery calls/week target","gold":true},
         {"value":"60%",    "label":"Discovery → proposal conversion"},
         {"value":"2",      "label":"New clients signed/month","gold":true},
-        {"value":"£175K",  "label":"Annual revenue target"}
+        {"value":"�R175K",  "label":"Annual revenue target"}
       ]
     },
     {
@@ -634,7 +634,7 @@ insert into project_sections (project_slug, section_id, section_order, data) val
         ["Discovery calls booked",     "5",       "20",      "Calendar"],
         ["Proposals sent",             "3",       "12",      "CRM / OneDrive"],
         ["Clients signed",             "0.5",     "2",       "CRM"],
-        ["Revenue invoiced (£)",       "£3,365",  "£14,583", "Xero / FreeAgent"],
+        ["Revenue invoiced (�R)",       "�R3,365",  "�R14,583", "Xero / FreeAgent"],
         ["Active agents live",         "—",       "+1/month","Client delivery tracker"],
         ["NPS / client satisfaction",  "—",       "Quarterly","Post-delivery survey"]
       ]
@@ -715,9 +715,9 @@ insert into project_sections (project_slug, section_id, section_order, data) val
     {
       "type": "month-cards",
       "items": [
-        {"period":"Month 1","focus":"Foundation","target":"1 client signed, £500–£3,500 revenue, PIL bot live"},
+        {"period":"Month 1","focus":"Foundation","target":"1 client signed, �R500–�R3,500 revenue, PIL bot live"},
         {"period":"Month 2","focus":"Build",     "target":"2–3 clients active, artefact library built, 2nd bot deployed"},
-        {"period":"Month 3","focus":"Scale",     "target":"£10K+ MRR, first retainer, LinkedIn system running autonomously"}
+        {"period":"Month 3","focus":"Scale",     "target":"�R10K+ MRR, first retainer, LinkedIn system running autonomously"}
       ]
     },
     {
@@ -728,8 +728,8 @@ insert into project_sections (project_slug, section_id, section_order, data) val
         {"id":"r90-1","label":"Month 1: PIL BA Agent live in Teams and signed off by client"},
         {"id":"r90-2","label":"Month 2: Artefact library complete — all 6 templates built and stored in OneDrive"},
         {"id":"r90-3","label":"Month 2: 3 active client engagements running concurrently"},
-        {"id":"r90-4","label":"Month 3: First Agent of Record retainer (£9,500/month) signed"},
-        {"id":"r90-5","label":"Month 3: £10K+ MRR achieved — pipeline strong enough to sustain without new outreach for 30 days"}
+        {"id":"r90-4","label":"Month 3: First Agent of Record retainer (�R9,500/month) signed"},
+        {"id":"r90-5","label":"Month 3: �R10K+ MRR achieved — pipeline strong enough to sustain without new outreach for 30 days"}
       ]
     },
     {
