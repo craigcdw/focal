@@ -67,7 +67,7 @@ export function DatePicker({ value, onChange, placeholder = "Pick a date" }: Dat
               day: "w-9 h-9 flex items-center justify-center",
               day_button: "w-8 h-8 rounded-xl text-sm font-medium transition-colors hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-200 focus:outline-none",
               selected: "bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl hover:bg-gray-800",
-              today: "text-blue-500 font-semibold",
+              today: "text-blue-500 font-semibold bg-blue-50 dark:bg-blue-950/40 rounded-xl ring-1 ring-blue-300 dark:ring-blue-700",
               outside: "opacity-30",
               disabled: "opacity-20 cursor-not-allowed",
             }}
