@@ -1,21 +1,20 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
-const VAPID_PUBLIC_KEY = Deno.env.get("VAPID_PUBLIC_KEY")!;
-const VAPID_PRIVATE_KEY = Deno.env.get("VAPID_PRIVATE_KEY")!;
+const VAPID_PUBLIC_KEY = Deno.env.get("VAPID_PUBLIC_KEY");
+const VAPID_PRIVATE_KEY = Deno.env.get("VAPID_PRIVATE_KEY");
 const VAPID_SUBJECT = "mailto:craigcdw@gmail.com";
 
-// ── VAPID JWT ─────────────────────────────────────────────────────────────────
-function base64urlToUint8(s: string) {
+function base64urlToUint8(s) {
   const pad = "=".repeat((4 - (s.length % 4)) % 4);
   const b64 = (s + pad).replace(/-/g, "+").replace(/_/g, "/");
   return Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
 }
 
-function uint8ToBase64url(buf: Uint8Array) {
+function uint8ToBase64url(buf) {
   return btoa(String.fromCharCode(...buf)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
 }
 
-async function makeVapidJwt(audience: string): Promise<string> {
+async function makeVapidJwt(audience) {
   const header = uint8ToBase64url(new TextEncoder().encode(JSON.stringify({ typ: "JWT", alg: "ES256" })));
   const payload = uint8ToBase64url(new TextEncoder().encode(JSON.stringify({
     aud: audience,
@@ -23,16 +22,13 @@ async function makeVapidJwt(audience: string): Promise<string> {
     sub: VAPID_SUBJECT,
   })));
   const msg = new TextEncoder().encode(`${header}.${payload}`);
+  const raw = base64urlToUint8(VAPID_PRIVATE_KEY);
+  const prefix = new Uint8Array([0x30, 0x41, 0x02, 0x01, 0x00, 0x30, 0x13, 0x06, 0x07, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x02, 0x01, 0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03, 0x01, 0x07, 0x04, 0x27, 0x30, 0x25, 0x02, 0x01, 0x01, 0x04, 0x20]);
+  const combined = new Uint8Array(prefix.length + raw.length);
+  combined.set(prefix); combined.set(raw, prefix.length);
   const key = await crypto.subtle.importKey(
     "pkcs8",
-    (() => {
-      // Reconstruct PKCS8 from raw private key bytes
-      const raw = base64urlToUint8(VAPID_PRIVATE_KEY);
-      const prefix = new Uint8Array([0x30, 0x41, 0x02, 0x01, 0x00, 0x30, 0x13, 0x06, 0x07, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x02, 0x01, 0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03, 0x01, 0x07, 0x04, 0x27, 0x30, 0x25, 0x02, 0x01, 0x01, 0x04, 0x20]);
-      const combined = new Uint8Array(prefix.length + raw.length);
-      combined.set(prefix); combined.set(raw, prefix.length);
-      return combined.buffer;
-    })(),
+    combined.buffer,
     { name: "ECDSA", namedCurve: "P-256" },
     false,
     ["sign"]
@@ -41,15 +37,13 @@ async function makeVapidJwt(audience: string): Promise<string> {
   return `${header}.${payload}.${uint8ToBase64url(sig)}`;
 }
 
-// ── Send one push ─────────────────────────────────────────────────────────────
-async function sendPush(sub: { endpoint: string; keys: { p256dh: string; auth: string } }, title: string, body: string) {
+async function sendPush(sub, title, body) {
   const url = new URL(sub.endpoint);
   const audience = `${url.protocol}//${url.host}`;
   const jwt = await makeVapidJwt(audience);
 
   const payload = JSON.stringify({ title, body, tag: "focal-event" });
 
-  // Encrypt payload using Web Push encryption (RFC 8291)
   const authSecret = base64urlToUint8(sub.keys.auth);
   const receiverPublicKey = base64urlToUint8(sub.keys.p256dh);
 
@@ -61,12 +55,11 @@ async function sendPush(sub: { endpoint: string; keys: { p256dh: string; auth: s
 
   const salt = crypto.getRandomValues(new Uint8Array(16));
 
-  // HKDF extract
-  async function hkdfExtract(salt: Uint8Array, ikm: Uint8Array) {
-    const key = await crypto.subtle.importKey("raw", salt, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  async function hkdfExtract(saltBytes, ikm) {
+    const key = await crypto.subtle.importKey("raw", saltBytes, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
     return new Uint8Array(await crypto.subtle.sign("HMAC", key, ikm));
   }
-  async function hkdfExpand(prk: Uint8Array, info: Uint8Array, len: number) {
+  async function hkdfExpand(prk, info, len) {
     const key = await crypto.subtle.importKey("raw", prk, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
     const t = new Uint8Array(await crypto.subtle.sign("HMAC", key, new Uint8Array([...info, 1])));
     return t.slice(0, len);
@@ -103,17 +96,15 @@ async function sendPush(sub: { endpoint: string; keys: { p256dh: string; auth: s
   return res.status;
 }
 
-// ── Main ──────────────────────────────────────────────────────────────────────
 Deno.serve(async () => {
   const supabase = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    Deno.env.get("SUPABASE_URL"),
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")
   );
 
   const now = new Date();
   const windowEnd = new Date(now.getTime() + 16 * 60 * 1000);
 
-  // Get all events starting in the next 16 minutes with reminders on
   const { data: events } = await supabase
     .from("calendar_events")
     .select("id, title, start_date, user_id, reminder_enabled")
@@ -140,7 +131,7 @@ Deno.serve(async () => {
 
     try {
       const status = await sendPush(
-        subRow.subscription as { endpoint: string; keys: { p256dh: string; auth: string } },
+        subRow.subscription,
         `⏰ ${event.title}`,
         `Starting ${label}`
       );
